@@ -49,3 +49,8 @@ This will open the Postgresql shell inside the container.
 
 Note: You can use docker logs < container-id > to see the logs of the container.
 
+## TablePlus
+
+You can use [TablePlus](https://tableplus.com/) to connect to the database. You can download it from [here](https://tableplus.com/).
+
+Doing this will allow you to see the database schema in a GUI. You can also run queries from the GUI. It will make the development process easier.
