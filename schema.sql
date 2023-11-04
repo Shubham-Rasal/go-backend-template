@@ -1,23 +1,23 @@
 CREATE TABLE "follows" (
-  "following_user_id" integer,
-  "followed_user_id" integer,
-  "created_at" timestamp
+  "following_user_id" integer NOT NULL,
+  "followed_user_id" integer NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "users" (
   "id" integer PRIMARY KEY,
-  "username" varchar,
-  "role" varchar,
-  "created_at" timestamp
+  "username" varchar NOT NULL,
+  "role" varchar NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "posts" (
   "id" integer PRIMARY KEY,
-  "title" varchar,
+  "title" varchar NOT NULL,
   "body" text,
-  "user_id" integer,
-  "status" varchar,
-  "created_at" timestamp
+  "user_id" integer NOT NULL,
+  "status" varchar NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
 CREATE INDEX ON "follows" ("followed_user_id");
