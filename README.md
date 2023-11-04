@@ -54,3 +54,42 @@ Note: You can use docker logs < container-id > to see the logs of the container.
 You can use [TablePlus](https://tableplus.com/) to connect to the database. You can download it from [here](https://tableplus.com/).
 
 Doing this will allow you to see the database schema in a GUI. You can also run queries from the GUI. It will make the development process easier.
+
+## Makefile
+
+To make running commands easier, we will use a Makefile. You can read more about Makefiles [here](https://www.gnu.org/software/make/manual/make.html). Makefiles are used to automate tasks.
+
+For example to start the postgresql database, instead of running the longer command, we can add it to the Makefile and run it using `make creatpg`.
+
+```Makefile
+creatpg:
+	docker run --name some-postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:16-bookworm
+
+```
+
+Note: You also get auto-completion for Makefiles in your terminal.
+
+For now we can add the following commands to the Makefile.
+
+```Makefile
+
+creatpg:
+	docker run --name some-postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:16-bookworm
+
+runpg:
+	docker start some-postgres && docker ps
+
+stoppg:
+	docker stop some-postgres
+
+createdb:
+	docker exec -it some-postgres createdb --username=root --owner=root blog
+
+dropdb:
+	docker exec -it some-postgres dropdb blog 
+
+
+.PHONY: createdb dropdb creatpg runpg 
+
+```
+
