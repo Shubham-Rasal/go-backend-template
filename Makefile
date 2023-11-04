@@ -13,5 +13,10 @@ createdb:
 dropdb:
 	docker exec -it some-postgres dropdb blog 
 
+migrateup:
+	./migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose up
 
-.PHONY: createdb dropdb creatpg runpg 
+migratedown:
+	./migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose down
+
+.PHONY: createdb dropdb creatpg runpg  stoppg migrateup migratedown
