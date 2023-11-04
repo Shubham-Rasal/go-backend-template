@@ -49,11 +49,6 @@ This will open the Postgresql shell inside the container.
 
 Note: You can use docker logs < container-id > to see the logs of the container.
 
-## TablePlus
-
-You can use [TablePlus](https://tableplus.com/) to connect to the database. You can download it from [here](https://tableplus.com/).
-
-Doing this will allow you to see the database schema in a GUI. You can also run queries from the GUI. It will make the development process easier.
 
 ## Makefile
 
@@ -93,3 +88,71 @@ dropdb:
 
 ```
 
+## TablePlus
+
+You can use [TablePlus](https://tableplus.com/) to connect to the database. You can download it from [here](https://tableplus.com/).
+
+Doing this will allow you to see the database schema in a GUI. You can also run queries from the GUI. It will make the development process easier.
+
+![TablePlus](tableplus.png)
+
+Use the exported sql file (schema.sql in my case) and copy all the commands and paste them in the SQL editor of tableplus and run all.
+
+![Tables after running the command](tables.png)
+
+
+## Database Schema Migration 
+
+Migrations are used to manage the database schema. We can use migrations to create tables, add columns, remove columns, etc. We can also use migrations to seed the database with some data.
+
+Migrations are essential for the development process. It allows us to make changes to the database schema without losing any data. For our blog applicaton, we will be using a library called [golang-migrate](https://github.com/golang-migrate/migrate) to manage our migrations.
+
+Installation instructions can be found [here](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate).
+
+
+First we need to create a migration called init_schema. This migration will create the tables in the database. We can create this migration using the following command. Make a directory called `db/migration` and run the following command.
+
+```bash
+./migrate create -ext sql -dir db/migration -seq init_schema -verbose
+```
+
+This will create a file called `db/migration/000001_init_schema.up.sql` and `db/migration/000001_init_schema.down.sql`. The up file will contain the commands to create the tables and the down file will contain the commands to drop the tables. 
+
+Initially the files are empty. We can copy the commands from the exported sql file and paste them in the up file. For down file, we can add the following commands.
+
+```sql
+DROP TABLE IF EXISTS follows;
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS users;
+```
+
+Now to run the up migration, following command can be used:
+
+Note: Make sure the postgres container is running.
+
+```bash
+./migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose up
+```
+
+Confirm that the tables are created by refreshing in tableplus.
+
+Similarly rollback migration can be run like:
+
+```bash
+./migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose down
+```
+
+TODO: Enable ssl on postgress
+
+Don't forget to add the migration commands to the Makefile:
+
+```Makefile
+
+migrateup:
+	./migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose up
+
+migratedown:
+	./migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose down
+
+.PHONY: createdb dropdb creatpg runpg  stoppg migrateup migratedown
+```
