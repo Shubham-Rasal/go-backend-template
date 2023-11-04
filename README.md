@@ -142,7 +142,6 @@ Similarly rollback migration can be run like:
 ./migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose down
 ```
 
-TODO: Enable ssl on postgress
 
 Don't forget to add the migration commands to the Makefile:
 
@@ -156,3 +155,99 @@ migratedown:
 
 .PHONY: createdb dropdb creatpg runpg  stoppg migrateup migratedown
 ```
+
+TODO: Enable ssl on postgress
+
+## Generate code from SQL
+
+Following is a explaination for choosing sqlc for interacting with db.
+
+Adapted from the blog - https://blog.jetbrains.com/go/2023/04/27/comparing-db-packages/
+
+Blog Title: "Comparing database/sql, GORM, sqlx, and sqlc" by Sergey Kozlovskiy
+
+- Comparison of Go packages for working with databases: `database/sql`, `GORM`, `sqlx`, and `sqlc`.
+- `database/sql`: Standard library package for database operations in Go.
+- `sqlx`: Extension of `database/sql` with features like named parameters and struct scanning.
+- `sqlc`: SQL compiler generating type-safe code for raw SQL queries.
+- `GORM`: Full-featured Go ORM library for advanced querying.
+- Comparison factors: Features, ease of use, performance, and speed.
+- Code examples provided for each package.
+- Performance benchmarks show GORM excels for small record counts but lags for large records.
+- Conclusion: Choose the package based on your specific needs as a developer.
+- GORM for advanced querying and clean code.
+- `database/sql` and `sqlx` for basic queries.
+- `sqlc` for backend developers with many queries and tight deadlines.
+
+Choose `sqlc` for my Go database needs because it generates type-safe code, boosts productivity, offers good performance, is easy to use, has community support, and is ideal for backend development. It simplifies database interactions, making it a valuable choice for Go developers.
+
+
+### sqlc
+
+sqlc is a Go library that generates type-safe code from SQL queries. 
+
+Installation instructions can be found [here](https://docs.sqlc.dev/en/latest/overview/install.html).
+
+First create a sqlc.yaml file in the root directory of the project. This file will contain the configuration for sqlc. Following is the configuration for our blog application.
+
+```yaml
+
+version: "1"
+packages:
+  - name: "db"
+    path: "./db/sqlc"
+    queries: "./db/query/"
+    schema: "./db/migration/"
+    engine: "postgresql"
+    emit_json_tags: true
+    emit_prepared_queries: true
+    emit_interface: false
+    emit_exact_table_names: false
+
+```
+
+- `name`: Name of the package.
+- `path`: Path to the package.
+- `queries`: Path to the directory containing the queries.
+- `schema`: Path to the directory containing the schema.
+- `engine`: Database engine.
+- `emit_json_tags`: Emit json tags for the generated code.
+- `emit_prepared_queries`: Emit prepared queries for the generated code.
+- `emit_interface`: Emit interface for the generated code.
+- `emit_exact_table_names`: Emit exact table names for the generated code.
+
+Now we can run the following command to generate the code.
+
+```bash
+sqlc generate
+```
+
+This will give error because we have not created the queries yet. We can create the queries in the `db/query` directory. We can create a file called `user.sql` in the `db/query` directory and add the following query.
+
+```sql
+
+-- name: CreateUser :one
+INSERT INTO users (
+	username,
+	password_hash,
+	email
+) VALUES (
+	$1,
+	$2,
+	$3
+) RETURNING *;
+
+...
+
+```
+
+This query will create a user in the database. The `:one` in the query indicates that this query will return one row. The `$1`, `$2`, `$3` are the parameters for the query. The parameters are used to prevent SQL injection attacks.
+
+Now we can run the following command to generate the code.
+
+```bash
+sqlc generate
+```
+
+This will generate the code in the `db/sqlc` directory. We can use this code to interact with the database.
+
