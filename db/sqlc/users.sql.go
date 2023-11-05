@@ -10,7 +10,7 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (username, role) VALUES ($1, $2) RETURNING id, username, role, created_at
+INSERT INTO users (username, role) VALUES ($1, $2) RETURNING id, username, role, created_at, reputation
 `
 
 type CreateUserParams struct {
@@ -26,6 +26,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Username,
 		&i.Role,
 		&i.CreatedAt,
+		&i.Reputation,
 	)
 	return i, err
 }
@@ -35,17 +36,17 @@ DELETE FROM users
 WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
+func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 	_, err := q.exec(ctx, q.deleteUserStmt, deleteUser, id)
 	return err
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, role, created_at FROM users
+SELECT id, username, role, created_at, reputation FROM users
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
+func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 	row := q.queryRow(ctx, q.getUserStmt, getUser, id)
 	var i User
 	err := row.Scan(
@@ -53,12 +54,13 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 		&i.Username,
 		&i.Role,
 		&i.CreatedAt,
+		&i.Reputation,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, username, role, created_at FROM users
+SELECT id, username, role, created_at, reputation FROM users
 ORDER BY id 
 LIMIT $1
 OFFSET $2
@@ -83,6 +85,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.Username,
 			&i.Role,
 			&i.CreatedAt,
+			&i.Reputation,
 		); err != nil {
 			return nil, err
 		}
@@ -98,17 +101,23 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE users SET username = $1, role = $2
-WHERE id = $3
+UPDATE users SET username = $1, role = $2 , reputation = $3
+WHERE id = $4
 `
 
 type UpdateUserParams struct {
-	Username string `json:"username"`
-	Role     string `json:"role"`
-	ID       int32  `json:"id"`
+	Username   string `json:"username"`
+	Role       string `json:"role"`
+	Reputation int32  `json:"reputation"`
+	ID         int64  `json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.exec(ctx, q.updateUserStmt, updateUser, arg.Username, arg.Role, arg.ID)
+	_, err := q.exec(ctx, q.updateUserStmt, updateUser,
+		arg.Username,
+		arg.Role,
+		arg.Reputation,
+		arg.ID,
+	)
 	return err
 }
