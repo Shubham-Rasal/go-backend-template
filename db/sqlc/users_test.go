@@ -80,20 +80,16 @@ func TestUpdateUser(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, user1)
 
-	arg2 := UpdateUserParams{
-		ID:         user1.ID,
-		Username:   util.RandomUserName(),
-		Role:       util.RandomRole(),
+	arg2 := UpdateReputationParams{
+		ID:         user1.ID,		
 		Reputation: int32(util.RandomInt(0, 100)),
 	}
 
-	err = testQueries.UpdateUser(context.Background(), arg2)
+	err = testQueries.UpdateReputation(context.Background(), arg2)
 	require.NoError(t, err)
 
 	user2, err := testQueries.GetUser(context.Background(), user1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, user2)
-	require.Equal(t, arg2.Username, user2.Username)
-	require.Equal(t, arg2.Role, user2.Role)
 	require.Equal(t, arg2.Reputation, user2.Reputation)
 }

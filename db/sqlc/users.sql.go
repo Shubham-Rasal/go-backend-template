@@ -100,24 +100,17 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 	return items, nil
 }
 
-const updateUser = `-- name: UpdateUser :exec
-UPDATE users SET username = $1, role = $2 , reputation = $3
-WHERE id = $4
+const updateReputation = `-- name: UpdateReputation :exec
+UPDATE users SET reputation = reputation + $1
+WHERE id = $2
 `
 
-type UpdateUserParams struct {
-	Username   string `json:"username"`
-	Role       string `json:"role"`
-	Reputation int32  `json:"reputation"`
-	ID         int64  `json:"id"`
+type UpdateReputationParams struct {
+	Reputation int32 `json:"reputation"`
+	ID         int64 `json:"id"`
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.exec(ctx, q.updateUserStmt, updateUser,
-		arg.Username,
-		arg.Role,
-		arg.Reputation,
-		arg.ID,
-	)
+func (q *Queries) UpdateReputation(ctx context.Context, arg UpdateReputationParams) error {
+	_, err := q.exec(ctx, q.updateReputationStmt, updateReputation, arg.Reputation, arg.ID)
 	return err
 }

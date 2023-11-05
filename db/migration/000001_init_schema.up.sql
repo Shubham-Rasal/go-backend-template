@@ -14,7 +14,7 @@ CREATE TABLE "users" (
 CREATE TABLE "posts" (
   "id" bigserial PRIMARY KEY,
   "title" varchar NOT NULL,
-  "body" text,
+  "body" text NOT NULL,
   "user_id" integer NOT NULL,
   "status" varchar NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT 'now()'
