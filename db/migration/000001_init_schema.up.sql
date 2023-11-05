@@ -1,18 +1,17 @@
-CREATE TABLE  IF NOT EXISTS "users" (
-  "id" integer PRIMARY KEY,
-  "username" varchar NOT NULL,
-  "role" varchar NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT 'now()'
-);
-
-
-CREATE TABLE  IF NOT EXISTS "follows" (
+CREATE TABLE "follows" (
   "following_user_id" integer NOT NULL,
   "followed_user_id" integer NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
-CREATE TABLE IF NOT EXISTS "posts" (
+CREATE TABLE "users" (
+  "id" bigserial PRIMARY KEY,
+  "username" varchar NOT NULL,
+  "role" varchar NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT 'now()'
+);
+
+CREATE TABLE "posts" (
   "id" integer PRIMARY KEY,
   "title" varchar NOT NULL,
   "body" text,

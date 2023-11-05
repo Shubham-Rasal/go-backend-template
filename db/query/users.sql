@@ -13,8 +13,8 @@ LIMIT $1
 OFFSET $2;
 
 -- name: UpdateUser :exec
-UPDATE users SET username = $1, role = $2
-WHERE id = $3;
+UPDATE users SET username = $1, role = $2 , reputation = $3
+WHERE id = $4;
 
 -- name: DeleteUser :exec
 DELETE FROM users

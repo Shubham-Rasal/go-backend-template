@@ -5,7 +5,7 @@ CREATE TABLE "follows" (
 );
 
 CREATE TABLE "users" (
-  "id" integer PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "role" varchar NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT 'now()'
