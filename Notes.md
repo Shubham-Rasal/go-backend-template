@@ -50,3 +50,9 @@ ALTER TABLE posts ADD COLUMN likes INTEGER NOT NULL DEFAULT 0;
 -- +migrate Down
 ALTER TABLE posts DROP COLUMN likes;
 ```
+
+
+TODO: make an issue on sqlc for not gereating correct code for returning values after update
+
+
+I think the best way to get into OS is to use a bunch of projects, packages and tools. When you use them, you will find bugs, missing features, and other things that you can fix.``

@@ -15,4 +15,4 @@ OFFSET $2;
 
 -- name: LikePost :exec
 UPDATE "posts" SET "likes" = "likes" + 1
-WHERE id = $1;
+WHERE id = $1 RETURNING *;

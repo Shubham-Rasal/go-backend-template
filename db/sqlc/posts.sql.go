@@ -63,7 +63,7 @@ func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
 
 const likePost = `-- name: LikePost :exec
 UPDATE "posts" SET "likes" = "likes" + 1
-WHERE id = $1
+WHERE id = $1 RETURNING id, title, body, user_id, status, created_at, likes
 `
 
 func (q *Queries) LikePost(ctx context.Context, id int64) error {

@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 )
 
 // has db and set of queries to interact with the database
@@ -28,8 +29,6 @@ func (store *Store) execTransaction(ctx context.Context, fn func(*Queries) error
 	if err != nil {
 		return err
 	}
-
-
 	//we pass in the trasaction object to new as it is an interface that implements the both db and tx
 	q := New(transaction)
 
@@ -38,11 +37,38 @@ func (store *Store) execTransaction(ctx context.Context, fn func(*Queries) error
 	if err != nil {
 		//if there is an error, rollback the transaction
 		if rbErr := transaction.Rollback(); rbErr != nil {
-			return rbErr
+			return fmt.Errorf("transaction error: %v, rollback error: %v", err, rbErr)
 		}
 		return err
 	}
 
 	//if there is no error, commit the transaction
 	return transaction.Commit()
+}
+
+type LikePostParams struct {
+	UserID int32 `json:"user_id"`
+	PostID int32 `json:"post_id"`
+}
+
+
+//like a post and update the reputation of the author
+func (store *Store) LikeTx(ctx context.Context, arg LikePostParams) (bool, error) {
+	err := store.execTransaction(ctx, func(q *Queries) error {
+		var err error
+		//like the post
+		err = q.LikePost(ctx, int64(arg.UserID))
+		if err != nil {
+			return err
+		}
+		//update the reputation of the author
+		err = q.UpdateReputation(ctx, UpdateReputationParams{
+			ID:         int64(arg.UserID),
+			Reputation: 10,
+		})
+		return err
+	})
+
+	//get the new like and reputation count
+	return true, err
 }
