@@ -21,7 +21,7 @@ func NewStore(db *sql.DB) *Store {
 }
 
 // creates a closure that executes a function within a database transaction
-//whatever queries we write in the @fn will be executed in a transaction
+// whatever queries we write in the @fn will be executed in a transaction
 func (store *Store) execTransaction(ctx context.Context, fn func(*Queries) error) error {
 
 	//create a transaction
@@ -51,9 +51,8 @@ type LikePostParams struct {
 	PostID int32 `json:"post_id"`
 }
 
-
-//like a post and update the reputation of the author
-func (store *Store) LikeTx(ctx context.Context, arg LikePostParams) (bool, error) {
+// like a post and update the reputation of the author
+func (store *Store) LikeTx(ctx context.Context, arg LikePostParams) error {
 	err := store.execTransaction(ctx, func(q *Queries) error {
 		var err error
 		//like the post
@@ -61,6 +60,8 @@ func (store *Store) LikeTx(ctx context.Context, arg LikePostParams) (bool, error
 		if err != nil {
 			return err
 		}
+
+		//TODO: solve deadlock
 		//update the reputation of the author
 		err = q.UpdateReputation(ctx, UpdateReputationParams{
 			ID:         int64(arg.UserID),
@@ -70,5 +71,5 @@ func (store *Store) LikeTx(ctx context.Context, arg LikePostParams) (bool, error
 	})
 
 	//get the new like and reputation count
-	return true, err
+	return err
 }
