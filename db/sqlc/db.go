@@ -24,26 +24,43 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.createPostStmt, err = db.PrepareContext(ctx, createPost); err != nil {
+		return nil, fmt.Errorf("error preparing query CreatePost: %w", err)
+	}
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
 	}
+	if q.getPostStmt, err = db.PrepareContext(ctx, getPost); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPost: %w", err)
+	}
 	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
+	}
+	if q.likePostStmt, err = db.PrepareContext(ctx, likePost); err != nil {
+		return nil, fmt.Errorf("error preparing query LikePost: %w", err)
+	}
+	if q.listPostsStmt, err = db.PrepareContext(ctx, listPosts); err != nil {
+		return nil, fmt.Errorf("error preparing query ListPosts: %w", err)
 	}
 	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
 	}
-	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
+	if q.updateReputationStmt, err = db.PrepareContext(ctx, updateReputation); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateReputation: %w", err)
 	}
 	return &q, nil
 }
 
 func (q *Queries) Close() error {
 	var err error
+	if q.createPostStmt != nil {
+		if cerr := q.createPostStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createPostStmt: %w", cerr)
+		}
+	}
 	if q.createUserStmt != nil {
 		if cerr := q.createUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
@@ -54,9 +71,24 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
 		}
 	}
+	if q.getPostStmt != nil {
+		if cerr := q.getPostStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPostStmt: %w", cerr)
+		}
+	}
 	if q.getUserStmt != nil {
 		if cerr := q.getUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
+		}
+	}
+	if q.likePostStmt != nil {
+		if cerr := q.likePostStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing likePostStmt: %w", cerr)
+		}
+	}
+	if q.listPostsStmt != nil {
+		if cerr := q.listPostsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listPostsStmt: %w", cerr)
 		}
 	}
 	if q.listUsersStmt != nil {
@@ -64,9 +96,9 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
 		}
 	}
-	if q.updateUserStmt != nil {
-		if cerr := q.updateUserStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateUserStmt: %w", cerr)
+	if q.updateReputationStmt != nil {
+		if cerr := q.updateReputationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateReputationStmt: %w", cerr)
 		}
 	}
 	return err
@@ -106,23 +138,31 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db             DBTX
-	tx             *sql.Tx
-	createUserStmt *sql.Stmt
-	deleteUserStmt *sql.Stmt
-	getUserStmt    *sql.Stmt
-	listUsersStmt  *sql.Stmt
-	updateUserStmt *sql.Stmt
+	db                   DBTX
+	tx                   *sql.Tx
+	createPostStmt       *sql.Stmt
+	createUserStmt       *sql.Stmt
+	deleteUserStmt       *sql.Stmt
+	getPostStmt          *sql.Stmt
+	getUserStmt          *sql.Stmt
+	likePostStmt         *sql.Stmt
+	listPostsStmt        *sql.Stmt
+	listUsersStmt        *sql.Stmt
+	updateReputationStmt *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:             tx,
-		tx:             tx,
-		createUserStmt: q.createUserStmt,
-		deleteUserStmt: q.deleteUserStmt,
-		getUserStmt:    q.getUserStmt,
-		listUsersStmt:  q.listUsersStmt,
-		updateUserStmt: q.updateUserStmt,
+		db:                   tx,
+		tx:                   tx,
+		createPostStmt:       q.createPostStmt,
+		createUserStmt:       q.createUserStmt,
+		deleteUserStmt:       q.deleteUserStmt,
+		getPostStmt:          q.getPostStmt,
+		getUserStmt:          q.getUserStmt,
+		likePostStmt:         q.likePostStmt,
+		listPostsStmt:        q.listPostsStmt,
+		listUsersStmt:        q.listUsersStmt,
+		updateReputationStmt: q.updateReputationStmt,
 	}
 }

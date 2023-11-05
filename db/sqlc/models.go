@@ -5,7 +5,6 @@
 package db
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -16,13 +15,14 @@ type Follow struct {
 }
 
 type Post struct {
-	ID    int32  `json:"id"`
+	ID    int64  `json:"id"`
 	Title string `json:"title"`
 	// Content of the post
-	Body      sql.NullString `json:"body"`
-	UserID    int32          `json:"user_id"`
-	Status    string         `json:"status"`
-	CreatedAt time.Time      `json:"created_at"`
+	Body      string    `json:"body"`
+	UserID    int32     `json:"user_id"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+	Likes     int32     `json:"likes"`
 }
 
 type User struct {
