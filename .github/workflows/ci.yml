@@ -1,7 +1,9 @@
-# This workflow will build a golang project
+# FILEPATH: /d:/coding/goPrograms/practice/.github/workflows/ci.yml
+# This workflow will build a golang project and run tests.
+# It uses PostgreSQL as a service and runs migrations before running tests.
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Go
+name: ci-test
 
 on:
   push:
