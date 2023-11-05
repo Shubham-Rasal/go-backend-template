@@ -14,10 +14,10 @@ dropdb:
 	docker exec -it some-postgres dropdb blog 
 
 migrateup:
-	./migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose up $(step)
+	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose up $(step)
 
 migratedown:
-	./migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose down $(step)
+	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose down $(step)
 
 sqlc:
 	sqlc generate
