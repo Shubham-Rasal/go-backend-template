@@ -8,15 +8,17 @@ CREATE TABLE "users" (
   "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "role" varchar NOT NULL,
+  "reputation" integer NOT NULL DEFAULT 0,
   "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "posts" (
-  "id" integer PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "title" varchar NOT NULL,
   "body" text,
   "user_id" integer NOT NULL,
   "status" varchar NOT NULL,
+  "likes" integer NOT NULL DEFAULT 0,
   "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
