@@ -40,9 +40,7 @@ jobs:
     - name: Install Migration Tool
       run: |
         curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/migrate.linux-amd64.tar.gz | tar xvz
-        mv migrate.linux-amd64 migrate
-        chmod +x migrate
-        sudo mv migrate /usr/local/bin/
+        mv migrate /usr/local/bin/
         which migrate
     
     - name: Run migrations
