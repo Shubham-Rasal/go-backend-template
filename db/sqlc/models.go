@@ -26,8 +26,9 @@ type Post struct {
 }
 
 type User struct {
-	ID        int32     `json:"id"`
-	Username  string    `json:"username"`
-	Role      string    `json:"role"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         int64     `json:"id"`
+	Username   string    `json:"username"`
+	Role       string    `json:"role"`
+	CreatedAt  time.Time `json:"created_at"`
+	Reputation int32     `json:"reputation"`
 }
