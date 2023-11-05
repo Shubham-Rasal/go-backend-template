@@ -251,3 +251,36 @@ sqlc generate
 
 This will generate the code in the `db/sqlc` directory. We can use this code to interact with the database.
 
+Three files generated:
+
+- `db.go`: Contains the database connection code.
+- `models.go`: Contains the models for the tables.
+- `users.sql.go`: Contains the code for the queries.
+
+## Testing the generated code
+
+Tests in Go are written using the testing package. You can read more about it [here](https://golang.org/pkg/testing/).
+
+We can create a file called `main_test.go` in the `db/sqlc` directory and add the required test.
+User specific tests are added in `user_test.go` file.
+
+For example, to test the CreateUser query, we can add the following test.
+
+```go
+
+func TestCreateUser(t *testing.T) {
+	arg := CreateUserParams{
+		Username: util.RandomUserName(),
+		Role:     util.RandomRole(),
+	}
+
+	user, err := testQueries.CreateUser(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, user)
+	require.Equal(t, arg.Username, user.Username)
+	require.Equal(t, arg.Role, user.Role)
+}
+
+```
+
+Note: The utils file contains a file `random.go` to generate random strings and numbers.
