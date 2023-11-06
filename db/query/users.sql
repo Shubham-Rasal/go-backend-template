@@ -18,4 +18,4 @@ WHERE id = $2;
 
 -- name: DeleteUser :exec
 DELETE FROM users
-WHERE id = $1;
+WHERE id = $1 RETURNING id;
