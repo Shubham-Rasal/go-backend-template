@@ -365,3 +365,54 @@ Installing a migration tool by downloading it from a URL, moving it to /usr/loca
 Running migrations using a make command.
 Running tests using another make command.
 
+
+
+
+## Rest API using go fiber
+
+To create a rest api, we will use a library called [fiber](https://docs.gofiber.io/). It is a powerful wrapper around the go standard net/http package with many built-in features.
+
+You can easily create routes and handlers using fiber as follows.
+
+```go
+
+package main
+
+import "github.com/gofiber/fiber/v2"
+
+func main() {
+    app := fiber.New()
+
+    app.Get("/", func(c *fiber.Ctx) error {
+        return c.SendString("Hello, World!")
+    })
+
+    app.Listen(":3000")
+}
+
+```
+
+All server related stuff is going in the api diretory. A `server` struct encapsulates all the features of our backend using structure embedding.
+
+
+```go
+
+type Server struct {
+	store     db.Store
+	router    *fiber.App
+	validator *validator.Validate
+}
+
+//Install it using : go get github.com/go-playground/validator/v10
+
+```
+
+We use a library called [validator](https://github.com/go-playground/validator) for input validation.
+It uses tags to figure out the correct field in input and output params.
+
+
+
+
+
+
+
