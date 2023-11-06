@@ -372,6 +372,9 @@ Running tests using another make command.
 
 To create a rest api, we will use a library called [fiber](https://docs.gofiber.io/). It is a powerful wrapper around the go standard net/http package with many built-in features.
 
+
+### Routes and Handlers
+
 You can easily create routes and handlers using fiber as follows.
 
 ```go
@@ -407,8 +410,53 @@ type Server struct {
 
 ```
 
+NOTE: To test the APIs, following tools can be used
+
+- postman
+- thunderclient (vscode extension)
+- cURL
+
+
+### Middlewares
+
 We use a library called [validator](https://github.com/go-playground/validator) for input validation.
 It uses tags to figure out the correct field in input and output params.
+
+```go
+
+type ListUsersQueryParams struct {
+	PageId int32 `validate:"required,min=1"`
+	PageSize int32 `validate:"required,min=5,max=10"`
+}
+
+func (server *Server) listUsers(c *fiber.Ctx) error {
+	var params ListUsersQueryParams
+	err := c.QueryParser(&params)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+		return err
+	}
+
+	// Validate request
+	if err := server.validator.Struct(params); err != nil {
+		c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+		return err
+	}
+  ...
+```
+
+Here we are validating the query params for the list users endpoint. The `validate` tag is used to specify the validation rules. The `required` tag is used to specify that the field is required. The `min` and `max` tags are used to specify the minimum and maximum values for the field.
+
+## Environment variables
+
+All global variables like `serverAddress` , `dbSource` are replace by environment variables.
+These are loaded using a utility called [viper](https://github.com/spf13/viper).
+
+One cool feature I like about the viper setup is that the env variables are loaded into a struct which makes it really easy for auto-complete and interllisense.
+
+
+
+
 
 
 
