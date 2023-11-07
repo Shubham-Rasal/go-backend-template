@@ -1,5 +1,7 @@
 # TODO
 
-- [ ]  make an issue on sqlc for not gereating correct code for returning values after update\
+- [ ]  make an issue on sqlc for not generating correct code for returning values after update\
 - [ ]  add activity table to revise the process
-- [ ]  custom validator, return custom err instead of 500
+- [ ]  custom validator for user type, return custom err instead of 500
+- [ ]  implement authentication first using jwt, then paseto and then OAuth2
+- [ ]  make an issue on jwt page for checking error : error handling in jwt
