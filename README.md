@@ -445,6 +445,7 @@ func (server *Server) listUsers(c *fiber.Ctx) error {
   ...
 ```
 
+
 Here we are validating the query params for the list users endpoint. The `validate` tag is used to specify the validation rules. The `required` tag is used to specify that the field is required. The `min` and `max` tags are used to specify the minimum and maximum values for the field.
 
 ## Environment variables
@@ -455,7 +456,12 @@ These are loaded using a utility called [viper](https://github.com/spf13/viper).
 One cool feature I like about the viper setup is that the env variables are loaded into a struct which makes it really easy for auto-complete and interllisense.
 
 
+## Mock DB
 
+There are two ways to mock the database.
+
+- using a mock in memory database, but requires a lot of code
+- using db stubs (mocks) using [mock]()
 
 
 

@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"strconv"
 
 	db "github.com/Shubham-Rasal/blog-backend/db/sqlc"
@@ -14,7 +16,7 @@ type createUserRequest struct {
 }
 
 type ListUsersQueryParams struct {
-	PageId int32 `validate:"required,min=1"`
+	PageId   int32 `validate:"required,min=1"`
 	PageSize int32 `validate:"required,min=5,max=10"`
 }
 
@@ -35,7 +37,7 @@ func (server *Server) listUsers(c *fiber.Ctx) error {
 
 	args := db.ListUsersParams{
 		Limit:  params.PageSize,
-		Offset: (params.PageId -1) * params.PageSize,
+		Offset: (params.PageId - 1) * params.PageSize,
 	}
 
 	users, err := server.store.ListUsers(context.Background(), args)
@@ -92,13 +94,19 @@ func (server *Server) getUser(c *fiber.Ctx) error {
 
 	// Validate request
 	if err := server.validator.Struct(req); err != nil {
-		c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-		return err
+		fmt.Print("validation err : ", err)
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+		// return err
 	}
 
 	// Get user from database
 	user, err := server.store.GetUser(context.Background(), int64(req.ID))
 	if err != nil {
+
+		if err == sql.ErrNoRows {
+			return c.Status(fiber.StatusNotFound).JSON(errorResponse(err))
+		}
+
 		c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 		return err
 	}
