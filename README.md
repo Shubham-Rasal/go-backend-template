@@ -461,8 +461,93 @@ One cool feature I like about the viper setup is that the env variables are load
 There are two ways to mock the database.
 
 - using a mock in memory database, but requires a lot of code
-- using db stubs (mocks) using [mock]()
+- using db stubs (mocks) using [mock](https://github.com/uber-go/mock).
 
+
+For mock to work in reflect mode (dev mode) we need to add a black import to the `main.go` file.
+
+For making a mock store we need a generalised interfact `Store`. We abstract it away from out sql postgress store by removing the methods to an interface and make the old store as `SQLStore`.
+
+```go
+
+//generic interface for all the queries
+//anyone who wants to be a store must implement this interface
+type Store interface {
+	Querier //genrated by sqlc
+	LikeTx(ctx context.Context, arg LikePostParams) error
+}
+
+// has db and set of queries to interact with the database
+type SQLStore struct {
+	db *sql.DB
+	*Queries
+}
+
+// constructor
+func NewStore(db *sql.DB) Store {
+
+	//sqlstore implements the store interface as the queries field is a part of it
+	//and the likeTx method is implemented by the sqlstore
+	return &SQLStore{
+		db:      db,
+		Queries: New(db),
+	}
+}
+
+```
+
+We can add all the funcion signatures to the store manually but a better way would be to somehow generate the signatures automatically. This can be easily done by toggling the following parameter in`sqlc.yaml`
+
+```yml
+
+# version: "1"
+# packages:
+#   - name: "db"
+#     path: "./db/sqlc"
+#     queries: "./db/query/"
+#     schema: "./db/migration/"
+#     engine: "postgresql"
+#     emit_json_tags: true
+#     emit_prepared_queries: true
+    emit_interface: true
+#     emit_exact_table_names: false
+#     emit_empty_slices: true
+
+```
+This generates a `Querier` strunt to embed in the store interface.
+
+The `SQLStore` already implements the interfact `Store`. Now we use this definition to generate a mock store using the following command -
+
+```bash
+mockgen -package mockdb -destination db/mock/store.go <insert-your-package-name>/db/sqlc Store
+```
+
+This generates a store.go in `mock` folder which can now be used to test apis without accessing the actual db.
+
+For example,
+
+```go
+
+{
+			name:   "OK",
+			userId: int64(user.ID),
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().GetUser(gomock.Any(), gomock.Eq(user.ID)).Times(1).Return(user, nil)
+			},
+			checkResponse: func(t *testing.T, response *http.Response) {
+				require.Equal(t, http.StatusOK, response.StatusCode)
+				requireBodyMatch(t, user, response)
+			},
+		},
+....
+
+```
+
+In software testing, a mock object is a simulated object that mimics the behavior of the real object in a controlled way. A mock object returns a specific pre-programmed response to a method call.
+
+A stub is a type of mock object that returns a pre-determined response to a method call. Stubs are used to replace real objects in a test and provide a predictable response to the code being tested.
+
+In the provided code, `buildStubs` is a function that creates a mock object of the `store` and sets an expectation that the `GetUser` method will be called once with the `user.ID` as an argument. This mock object is used to test the getUserHandler function in isolation from the actual database.In software testing, a mock object is a simulated object that mimics the behavior of the real object in a controlled way. A mock object returns a specific pre-programmed response to a method call.
 
 
 
