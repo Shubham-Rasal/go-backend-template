@@ -6,15 +6,25 @@ import (
 	"fmt"
 )
 
+//generic interface for all the queries
+//anyone who wants to be a store must implement this interface
+type Store interface {
+	Querier //genrated by sqlc
+	LikeTx(ctx context.Context, arg LikePostParams) error
+}
+
 // has db and set of queries to interact with the database
-type Store struct {
+type SQLStore struct {
 	db *sql.DB
 	*Queries
 }
 
 // constructor
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+
+	//sqlstore implements the store interface as the queries field is a part of it
+	//and the likeTx method is implemented by the sqlstore
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
@@ -22,7 +32,7 @@ func NewStore(db *sql.DB) *Store {
 
 // creates a closure that executes a function within a database transaction
 // whatever queries we write in the @fn will be executed in a transaction
-func (store *Store) execTransaction(ctx context.Context, fn func(*Queries) error) error {
+func (store SQLStore) execTransaction(ctx context.Context, fn func(*Queries) error) error {
 
 	//create a transaction
 	transaction, err := store.db.BeginTx(ctx, &sql.TxOptions{})
@@ -52,7 +62,7 @@ type LikePostParams struct {
 }
 
 // like a post and update the reputation of the author
-func (store *Store) LikeTx(ctx context.Context, arg LikePostParams) error {
+func (store *SQLStore) LikeTx(ctx context.Context, arg LikePostParams) error {
 	err := store.execTransaction(ctx, func(q *Queries) error {
 		var err error
 		//like the post
