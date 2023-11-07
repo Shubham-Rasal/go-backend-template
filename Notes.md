@@ -52,8 +52,5 @@ ALTER TABLE posts DROP COLUMN likes;
 ```
 
 
-TODO: make an issue on sqlc for not gereating correct code for returning values after update
-TODO: add activity table to revise the process
-TODO : custom validator, return custom err instead of 500
 
 I think the best way to get into OS is to use a bunch of projects, packages and tools. When you use them, you will find bugs, missing features, and other things that you can fix.``
