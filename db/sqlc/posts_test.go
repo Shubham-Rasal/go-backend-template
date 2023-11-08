@@ -10,19 +10,22 @@ import (
 )
 
 func createRandomPost(t *testing.T) Post {
-	userDetails := CreateUserParams{
+	user := createDummyUser(t)
+
+	accountDetails := CreateAccountParams{
 		Username: util.RandomUserName(),
 		Role:     util.RandomRole(),
+		UserID:   int32(user.ID),
 	}
 
-	user, err := testQueries.CreateUser(context.Background(), userDetails)
+	account, err := testQueries.CreateAccount(context.Background(), accountDetails)
 	require.NoError(t, err)
 
 	arg := CreatePostParams{
-		Title:     util.RandomString(7),
-		Body:      util.RandomString(7),
-		UserID:    int32(user.ID),
-		Status:    util.RandomString(7),
+		Title:  util.RandomString(7),
+		Body:   util.RandomString(7),
+		UserID: int32(account.UserID),
+		Status: util.RandomString(7),
 	}
 
 	post, err := testQueries.CreatePost(context.Background(), arg)

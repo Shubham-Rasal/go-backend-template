@@ -8,6 +8,15 @@ import (
 	"time"
 )
 
+type Account struct {
+	ID         int64     `json:"id"`
+	Username   string    `json:"username"`
+	Role       string    `json:"role"`
+	CreatedAt  time.Time `json:"created_at"`
+	Reputation int32     `json:"reputation"`
+	UserID     int32     `json:"user_id"`
+}
+
 type Follow struct {
 	FollowingUserID int32     `json:"following_user_id"`
 	FollowedUserID  int32     `json:"followed_user_id"`
@@ -26,9 +35,8 @@ type Post struct {
 }
 
 type User struct {
-	ID         int64     `json:"id"`
-	Username   string    `json:"username"`
-	Role       string    `json:"role"`
-	CreatedAt  time.Time `json:"created_at"`
-	Reputation int32     `json:"reputation"`
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
 }

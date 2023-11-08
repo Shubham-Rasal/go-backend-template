@@ -11,13 +11,13 @@ import (
 )
 
 type Server struct {
-	store     db.Store
-	router    *fiber.App
-	validator *validator.Validate
-	tokenMaker     token.Maker
+	store      db.Store
+	router     *fiber.App
+	validator  *validator.Validate
+	tokenMaker token.Maker
 }
 
-func NewServer(config util.Config , store db.Store) (*Server , error) {
+func NewServer(config util.Config, store db.Store) (*Server, error) {
 
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	if err != nil {
@@ -25,17 +25,17 @@ func NewServer(config util.Config , store db.Store) (*Server , error) {
 	}
 
 	server := &Server{
-		tokenMaker:     tokenMaker,
-		store:     store,
-		validator: validator.New(validator.WithRequiredStructEnabled()),
+		tokenMaker: tokenMaker,
+		store:      store,
+		validator:  validator.New(validator.WithRequiredStructEnabled()),
 	}
 
 	router := fiber.New()
 
-	router.Get("/users", server.listUsers)
-	router.Post("/users", server.createUser)
-	router.Get("/users/:id", server.getUser)
-	router.Delete("/users/:id", server.deleteUser)
+	router.Get("/accounts", server.listAccounts)
+	router.Post("/accounts", server.createAccount)
+	router.Get("/accounts/:id", server.getAccount)
+	router.Delete("/accounts/:id", server.deleteAccount)
 
 	router.Post("/posts", server.createPost)
 	router.Get("/posts/:id", server.getPost)
@@ -43,7 +43,7 @@ func NewServer(config util.Config , store db.Store) (*Server , error) {
 	router.Post("/posts/:id/like", server.likePost)
 
 	server.router = router
-	return server , nil
+	return server, nil
 }
 
 func (server *Server) Start(address string) error {

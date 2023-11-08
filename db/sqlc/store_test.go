@@ -13,16 +13,20 @@ func TestLikeTrasaction(t *testing.T) {
 	store := NewStore(testDB)
 
 	//create 5 users
-	var users []User
+	var accounts []Account
 	for i := 0; i < 5; i++ {
-		arg := CreateUserParams{
+
+		user := createDummyUser(t)
+
+		arg := CreateAccountParams{
 			Username: util.RandomUserName(),
 			Role:     util.RandomRole(),
+			UserID:   int32(user.ID),
 		}
-		user, err := store.CreateUser(context.Background(), arg)
+		account, err := store.CreateAccount(context.Background(), arg)
 		require.NoError(t, err)
-		require.NotEmpty(t, user)
-		users = append(users, user)
+		require.NotEmpty(t, account)
+		accounts = append(accounts, account)
 	}
 
 	//create 5 posts
@@ -31,7 +35,7 @@ func TestLikeTrasaction(t *testing.T) {
 		arg := CreatePostParams{
 			Title:  util.RandomString(7),
 			Body:   util.RandomString(70),
-			UserID: int32(users[i].ID),
+			UserID: int32(accounts[i].UserID),
 			Status: util.RandomString(7),
 		}
 		post, err := store.CreatePost(context.Background(), arg)
@@ -47,10 +51,10 @@ func TestLikeTrasaction(t *testing.T) {
 		index := i
 		go func() {
 			arg := LikePostParams{
-				UserID: int32(users[index].ID),
+				UserID: int32(accounts[index].UserID),
 				PostID: int32(posts[index].ID),
 			}
-			 err := store.LikeTx(context.Background(), arg)
+			err := store.LikeTx(context.Background(), arg)
 			errors <- err
 		}()
 	}

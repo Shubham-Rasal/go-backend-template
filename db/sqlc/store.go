@@ -6,8 +6,8 @@ import (
 	"fmt"
 )
 
-//generic interface for all the queries
-//anyone who wants to be a store must implement this interface
+// generic interface for all the queries
+// anyone who wants to be a store must implement this interface
 type Store interface {
 	Querier //genrated by sqlc
 	LikeTx(ctx context.Context, arg LikePostParams) error
@@ -74,7 +74,7 @@ func (store *SQLStore) LikeTx(ctx context.Context, arg LikePostParams) error {
 		//TODO: solve deadlock
 		//update the reputation of the author
 		err = q.UpdateReputation(ctx, UpdateReputationParams{
-			ID:         int64(arg.UserID),
+			UserID:     int32(arg.UserID),
 			Reputation: 10,
 		})
 		return err

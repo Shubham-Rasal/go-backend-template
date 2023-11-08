@@ -9,14 +9,20 @@ import (
 )
 
 type Querier interface {
+	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteAccount(ctx context.Context, userID int32) error
 	DeleteUser(ctx context.Context, id int64) error
+	GetAccount(ctx context.Context, userID int32) (Account, error)
 	GetPost(ctx context.Context, id int64) (Post, error)
 	GetUser(ctx context.Context, id int64) (User, error)
 	LikePost(ctx context.Context, id int64) error
+	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	UpdateEmail(ctx context.Context, arg UpdateEmailParams) error
+	UpdatePassword(ctx context.Context, arg UpdatePasswordParams) error
 	UpdateReputation(ctx context.Context, arg UpdateReputationParams) error
 }
 
