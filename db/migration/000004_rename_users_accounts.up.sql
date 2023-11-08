@@ -1,5 +1,5 @@
 ALTER TABLE "users" RENAME TO "accounts";
-ALTER TABLE "accounts" ADD COLUMN "user_id" integer unique;
+ALTER TABLE "accounts" ADD COLUMN "user_id" integer unique not null;
 
 CREATE TABLE "users" (
   "id" bigserial PRIMARY KEY,
