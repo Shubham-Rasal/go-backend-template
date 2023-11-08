@@ -4,6 +4,9 @@ creatpg:
 runpg:
 	docker start some-postgres && docker ps
 
+intopg:
+	docker exec -it some-postgres psql -U root
+
 stoppg:
 	docker stop some-postgres
 
@@ -13,11 +16,17 @@ createdb:
 dropdb:
 	docker exec -it some-postgres dropdb blog 
 
+createmigration:
+	migrate create -ext sql -dir db/migration -seq $(name) -verbose
+
 migrateup:
 	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose up $(step)
 
 migratedown:
 	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose down $(step)
+
+migrateforce:
+	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose force $(version)
 
 sqlc:
 	sqlc generate
@@ -31,4 +40,4 @@ server:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/Shubham-Rasal/blog-backend/db/sqlc Store
 
-.PHONY: createdb dropdb creatpg runpg  stoppg migrateup migratedown test sqlc server mock
+.PHONY: createdb dropdb creatpg runpg  stoppg migrateup migratedown test sqlc server mock intopg migrateforce createmigration
