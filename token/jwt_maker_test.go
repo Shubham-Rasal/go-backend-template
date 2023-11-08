@@ -33,7 +33,7 @@ func TestJWTMaker(t *testing.T) {
 	require.Equal(t, username, payload.Username)
 	require.NotZero(t, payload.ID)
 	require.NotZero(t, payload.IssuedAt)
-	require.WithinDuration(t, payload.ExpiredAt, time.Now().Add(duration), time.Second)
+	require.WithinDuration(t, payload.ExpiresAt, time.Now().Add(duration), time.Second)
 
 }
 

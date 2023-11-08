@@ -85,7 +85,7 @@ func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
 		ID:        uuid.MustParse(payload.ID),
 		Username:  payload.Username,
 		IssuedAt:  time.Unix(int64(payload.IssuedAt.Time.Unix()), 0),
-		ExpiredAt: time.Unix(int64(payload.ExpiresAt.Time.Unix()), 0),
+		ExpiresAt: time.Unix(int64(payload.ExpiresAt.Time.Unix()), 0),
 	}, nil
 
 }

@@ -11,7 +11,7 @@ type Payload struct {
 	ID        uuid.UUID `json:"id"`
 	Username  string    `json:"username"`
 	IssuedAt  time.Time `json:"issued_at"`
-	ExpiredAt time.Time `json:"expired_at"`
+	ExpiresAt time.Time `json:"expired_at"`
 }
 
 func NewPayload(username string, duration time.Duration) (*Payload, error) {
@@ -25,7 +25,7 @@ func NewPayload(username string, duration time.Duration) (*Payload, error) {
 		ID:        tokenId,
 		Username:  username,
 		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(duration),
+		ExpiresAt: time.Now().Add(duration),
 	}, nil
 
 }
@@ -42,9 +42,18 @@ func (payload *Payload) JWTPayload() JWTClaims {
 		jwt.RegisteredClaims{
 			// Also fixed dates can be used for the NumericDate
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(payload.ExpiredAt),
+			ExpiresAt: jwt.NewNumericDate(payload.ExpiresAt),
 			Issuer:    "blog",
 			ID:        payload.ID.String(),
 		},
 	}
+}
+
+func (payload *Payload) Valid() error {
+
+	if time.Now().After(payload.ExpiresAt) {
+		return ErrExpiredToken
+	}
+
+	return nil
 }
