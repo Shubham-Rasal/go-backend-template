@@ -1,7 +1,11 @@
 package api
 
 import (
+	"fmt"
+
 	db "github.com/Shubham-Rasal/blog-backend/db/sqlc"
+	"github.com/Shubham-Rasal/blog-backend/token"
+	"github.com/Shubham-Rasal/blog-backend/util"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,10 +14,18 @@ type Server struct {
 	store     db.Store
 	router    *fiber.App
 	validator *validator.Validate
+	tokenMaker     token.Maker
 }
 
-func NewServer(store db.Store) *Server {
+func NewServer(config util.Config , store db.Store) (*Server , error) {
+
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("connot create token maker : %w", err)
+	}
+
 	server := &Server{
+		tokenMaker:     tokenMaker,
 		store:     store,
 		validator: validator.New(validator.WithRequiredStructEnabled()),
 	}
@@ -31,7 +43,7 @@ func NewServer(store db.Store) *Server {
 	router.Post("/posts/:id/like", server.likePost)
 
 	server.router = router
-	return server
+	return server , nil
 }
 
 func (server *Server) Start(address string) error {

@@ -81,7 +81,8 @@ func TestGetUserAPI(t *testing.T) {
 			testcase.buildStubs(store)
 
 			//creates a serer as normals
-			server := NewServer(store)
+			server , err := newTestServer(t, store)
+			require.NoError(t, err)
 
 			url := fmt.Sprintf("/users/%d", testcase.userId)
 
