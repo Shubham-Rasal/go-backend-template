@@ -37,6 +37,11 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 	router.Get("/accounts/:id", server.getAccount)
 	router.Delete("/accounts/:id", server.deleteAccount)
 
+	router.Get("/users", server.listUsers)
+	router.Post("/users", server.createUser)
+	router.Get("/users/:id", server.getUser)
+	router.Delete("/users/:id", server.deleteUser)
+
 	router.Post("/posts", server.createPost)
 	router.Get("/posts/:id", server.getPost)
 	router.Get("/posts", server.listPosts)
