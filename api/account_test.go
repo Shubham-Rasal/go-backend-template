@@ -33,7 +33,7 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, response *http.Response) {
 				require.Equal(t, http.StatusOK, response.StatusCode)
-				requireBodyMatch(t, account, response)
+				requireAccountBodyMatch(t, account, response)
 			},
 		},
 		{
@@ -106,11 +106,10 @@ func crateRandomAccount() db.Account {
 	}
 }
 
-func requireBodyMatch(t *testing.T, user db.Account, response *http.Response) {
+func requireAccountBodyMatch(t *testing.T, user db.Account, response *http.Response) {
 	u, err := io.ReadAll(response.Body)
 	require.NoError(t, err)
-	var gotAccount db.Account
-	err = json.Unmarshal(u, &gotAccount)
+	var gotUser db.Account
+	err = json.Unmarshal(u, &gotUser)
 	require.NoError(t, err)
 }
-
