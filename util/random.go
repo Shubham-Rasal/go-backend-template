@@ -22,3 +22,7 @@ func RandomUserName() string {
 func RandomRole() string {
 	return RandomString(6)
 }
+
+func RandomEmail() string {
+	return RandomString(6) + "@" + RandomString(4) + ".com"
+}

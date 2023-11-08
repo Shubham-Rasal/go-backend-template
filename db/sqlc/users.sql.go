@@ -10,23 +10,23 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (username, role) VALUES ($1, $2) RETURNING id, username, role, created_at, reputation
+INSERT INTO users (username, password , email) VALUES ($1, $2, $3) RETURNING id, username, password, email
 `
 
 type CreateUserParams struct {
 	Username string `json:"username"`
-	Role     string `json:"role"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.queryRow(ctx, q.createUserStmt, createUser, arg.Username, arg.Role)
+	row := q.queryRow(ctx, q.createUserStmt, createUser, arg.Username, arg.Password, arg.Email)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Role,
-		&i.CreatedAt,
-		&i.Reputation,
+		&i.Password,
+		&i.Email,
 	)
 	return i, err
 }
@@ -42,7 +42,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, role, created_at, reputation FROM users
+SELECT id, username, password, email FROM users
 WHERE id = $1 LIMIT 1
 `
 
@@ -52,15 +52,14 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Role,
-		&i.CreatedAt,
-		&i.Reputation,
+		&i.Password,
+		&i.Email,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, username, role, created_at, reputation FROM users
+SELECT id, username, password, email FROM users
 ORDER BY id 
 LIMIT $1
 OFFSET $2
@@ -83,9 +82,8 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		if err := rows.Scan(
 			&i.ID,
 			&i.Username,
-			&i.Role,
-			&i.CreatedAt,
-			&i.Reputation,
+			&i.Password,
+			&i.Email,
 		); err != nil {
 			return nil, err
 		}
@@ -100,17 +98,32 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 	return items, nil
 }
 
-const updateReputation = `-- name: UpdateReputation :exec
-UPDATE users SET reputation = reputation + $1
+const updateEmail = `-- name: UpdateEmail :exec
+UPDATE users SET email = $1
 WHERE id = $2
 `
 
-type UpdateReputationParams struct {
-	Reputation int32 `json:"reputation"`
-	ID         int64 `json:"id"`
+type UpdateEmailParams struct {
+	Email string `json:"email"`
+	ID    int64  `json:"id"`
 }
 
-func (q *Queries) UpdateReputation(ctx context.Context, arg UpdateReputationParams) error {
-	_, err := q.exec(ctx, q.updateReputationStmt, updateReputation, arg.Reputation, arg.ID)
+func (q *Queries) UpdateEmail(ctx context.Context, arg UpdateEmailParams) error {
+	_, err := q.exec(ctx, q.updateEmailStmt, updateEmail, arg.Email, arg.ID)
+	return err
+}
+
+const updatePassword = `-- name: UpdatePassword :exec
+UPDATE users SET password = $1
+WHERE id = $2
+`
+
+type UpdatePasswordParams struct {
+	Password string `json:"password"`
+	ID       int64  `json:"id"`
+}
+
+func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) error {
+	_, err := q.exec(ctx, q.updatePasswordStmt, updatePassword, arg.Password, arg.ID)
 	return err
 }

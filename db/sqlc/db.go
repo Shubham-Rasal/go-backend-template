@@ -24,14 +24,23 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.createAccountStmt, err = db.PrepareContext(ctx, createAccount); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateAccount: %w", err)
+	}
 	if q.createPostStmt, err = db.PrepareContext(ctx, createPost); err != nil {
 		return nil, fmt.Errorf("error preparing query CreatePost: %w", err)
 	}
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
+	if q.deleteAccountStmt, err = db.PrepareContext(ctx, deleteAccount); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteAccount: %w", err)
+	}
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
+	}
+	if q.getAccountStmt, err = db.PrepareContext(ctx, getAccount); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAccount: %w", err)
 	}
 	if q.getPostStmt, err = db.PrepareContext(ctx, getPost); err != nil {
 		return nil, fmt.Errorf("error preparing query GetPost: %w", err)
@@ -42,11 +51,20 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.likePostStmt, err = db.PrepareContext(ctx, likePost); err != nil {
 		return nil, fmt.Errorf("error preparing query LikePost: %w", err)
 	}
+	if q.listAccountsStmt, err = db.PrepareContext(ctx, listAccounts); err != nil {
+		return nil, fmt.Errorf("error preparing query ListAccounts: %w", err)
+	}
 	if q.listPostsStmt, err = db.PrepareContext(ctx, listPosts); err != nil {
 		return nil, fmt.Errorf("error preparing query ListPosts: %w", err)
 	}
 	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
+	}
+	if q.updateEmailStmt, err = db.PrepareContext(ctx, updateEmail); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateEmail: %w", err)
+	}
+	if q.updatePasswordStmt, err = db.PrepareContext(ctx, updatePassword); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdatePassword: %w", err)
 	}
 	if q.updateReputationStmt, err = db.PrepareContext(ctx, updateReputation); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateReputation: %w", err)
@@ -56,6 +74,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.createAccountStmt != nil {
+		if cerr := q.createAccountStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createAccountStmt: %w", cerr)
+		}
+	}
 	if q.createPostStmt != nil {
 		if cerr := q.createPostStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createPostStmt: %w", cerr)
@@ -66,9 +89,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
 		}
 	}
+	if q.deleteAccountStmt != nil {
+		if cerr := q.deleteAccountStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteAccountStmt: %w", cerr)
+		}
+	}
 	if q.deleteUserStmt != nil {
 		if cerr := q.deleteUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
+		}
+	}
+	if q.getAccountStmt != nil {
+		if cerr := q.getAccountStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAccountStmt: %w", cerr)
 		}
 	}
 	if q.getPostStmt != nil {
@@ -86,6 +119,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing likePostStmt: %w", cerr)
 		}
 	}
+	if q.listAccountsStmt != nil {
+		if cerr := q.listAccountsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listAccountsStmt: %w", cerr)
+		}
+	}
 	if q.listPostsStmt != nil {
 		if cerr := q.listPostsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listPostsStmt: %w", cerr)
@@ -94,6 +132,16 @@ func (q *Queries) Close() error {
 	if q.listUsersStmt != nil {
 		if cerr := q.listUsersStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
+		}
+	}
+	if q.updateEmailStmt != nil {
+		if cerr := q.updateEmailStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateEmailStmt: %w", cerr)
+		}
+	}
+	if q.updatePasswordStmt != nil {
+		if cerr := q.updatePasswordStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updatePasswordStmt: %w", cerr)
 		}
 	}
 	if q.updateReputationStmt != nil {
@@ -140,14 +188,20 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                   DBTX
 	tx                   *sql.Tx
+	createAccountStmt    *sql.Stmt
 	createPostStmt       *sql.Stmt
 	createUserStmt       *sql.Stmt
+	deleteAccountStmt    *sql.Stmt
 	deleteUserStmt       *sql.Stmt
+	getAccountStmt       *sql.Stmt
 	getPostStmt          *sql.Stmt
 	getUserStmt          *sql.Stmt
 	likePostStmt         *sql.Stmt
+	listAccountsStmt     *sql.Stmt
 	listPostsStmt        *sql.Stmt
 	listUsersStmt        *sql.Stmt
+	updateEmailStmt      *sql.Stmt
+	updatePasswordStmt   *sql.Stmt
 	updateReputationStmt *sql.Stmt
 }
 
@@ -155,14 +209,20 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                   tx,
 		tx:                   tx,
+		createAccountStmt:    q.createAccountStmt,
 		createPostStmt:       q.createPostStmt,
 		createUserStmt:       q.createUserStmt,
+		deleteAccountStmt:    q.deleteAccountStmt,
 		deleteUserStmt:       q.deleteUserStmt,
+		getAccountStmt:       q.getAccountStmt,
 		getPostStmt:          q.getPostStmt,
 		getUserStmt:          q.getUserStmt,
 		likePostStmt:         q.likePostStmt,
+		listAccountsStmt:     q.listAccountsStmt,
 		listPostsStmt:        q.listPostsStmt,
 		listUsersStmt:        q.listUsersStmt,
+		updateEmailStmt:      q.updateEmailStmt,
+		updatePasswordStmt:   q.updatePasswordStmt,
 		updateReputationStmt: q.updateReputationStmt,
 	}
 }

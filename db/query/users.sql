@@ -1,5 +1,5 @@
 -- name: CreateUser :one
-INSERT INTO users (username, role) VALUES ($1, $2) RETURNING *;
+INSERT INTO users (username, password , email) VALUES ($1, $2, $3) RETURNING *;
 
 
 -- name: GetUser :one
@@ -12,8 +12,12 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
--- name: UpdateReputation :exec
-UPDATE users SET reputation = reputation + $1
+-- name: UpdatePassword :exec
+UPDATE users SET password = $1
+WHERE id = $2;
+
+-- name: UpdateEmail :exec
+UPDATE users SET email = $1
 WHERE id = $2;
 
 -- name: DeleteUser :exec
