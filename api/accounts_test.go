@@ -15,9 +15,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetUserAPI(t *testing.T) {
+func TestGetAccountAPI(t *testing.T) {
 
-	user := crateRandomUser()
+	account := crateRandomAccount()
 
 	testcases := []struct {
 		name          string
@@ -27,20 +27,20 @@ func TestGetUserAPI(t *testing.T) {
 	}{
 		{
 			name:   "OK",
-			userId: int64(user.ID),
+			userId: int64(account.UserID),
 			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().GetUser(gomock.Any(), gomock.Eq(user.ID)).Times(1).Return(user, nil)
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.UserID)).Times(1).Return(account, nil)
 			},
 			checkResponse: func(t *testing.T, response *http.Response) {
 				require.Equal(t, http.StatusOK, response.StatusCode)
-				requireBodyMatch(t, user, response)
+				requireBodyMatch(t, account, response)
 			},
 		},
 		{
 			name:   "Bad Request",
 			userId: 0,
 			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().GetUser(gomock.Any(), gomock.Any()).Times(0)
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, response *http.Response) {
 				require.Equal(t, http.StatusBadRequest, response.StatusCode)
@@ -48,9 +48,9 @@ func TestGetUserAPI(t *testing.T) {
 		},
 		{
 			name:   "Not Found",
-			userId: int64(user.ID),
+			userId: int64(account.UserID),
 			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().GetUser(gomock.Any(), gomock.Eq(user.ID)).Times(1).Return(db.User{}, sql.ErrNoRows)
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.UserID)).Times(1).Return(db.Account{}, sql.ErrNoRows)
 			},
 			checkResponse: func(t *testing.T, response *http.Response) {
 				require.Equal(t, http.StatusNotFound, response.StatusCode)
@@ -58,9 +58,9 @@ func TestGetUserAPI(t *testing.T) {
 		},
 		{
 			name:   "Internal Server Error",
-			userId: int64(user.ID),
+			userId: int64(account.UserID),
 			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().GetUser(gomock.Any(), gomock.Eq(user.ID)).Times(1).Return(db.User{}, sql.ErrConnDone)
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.UserID)).Times(1).Return(db.Account{}, sql.ErrConnDone)
 			},
 			checkResponse: func(t *testing.T, response *http.Response) {
 				require.Equal(t, http.StatusInternalServerError, response.StatusCode)
@@ -81,10 +81,10 @@ func TestGetUserAPI(t *testing.T) {
 			testcase.buildStubs(store)
 
 			//creates a serer as normals
-			server , err := newTestServer(t, store)
+			server, err := newTestServer(t, store)
 			require.NoError(t, err)
 
-			url := fmt.Sprintf("/users/%d", testcase.userId)
+			url := fmt.Sprintf("/accounts/%d", testcase.userId)
 
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
@@ -97,18 +97,20 @@ func TestGetUserAPI(t *testing.T) {
 
 }
 
-func crateRandomUser() db.User {
-	return db.User{
+func crateRandomAccount() db.Account {
+	return db.Account{
 		Username: util.RandomUserName(),
 		Role:     util.RandomRole(),
 		ID:       int64(util.RandomInt(1, 1000)),
+		UserID:   int32(util.RandomInt(1, 1000)),
 	}
 }
 
-func requireBodyMatch(t *testing.T, user db.User, response *http.Response) {
+func requireBodyMatch(t *testing.T, user db.Account, response *http.Response) {
 	u, err := io.ReadAll(response.Body)
 	require.NoError(t, err)
-	var gotUser db.User
-	err = json.Unmarshal(u, &gotUser)
+	var gotAccount db.Account
+	err = json.Unmarshal(u, &gotAccount)
 	require.NoError(t, err)
 }
+

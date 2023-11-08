@@ -10,19 +10,20 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type createUserRequest struct {
+type createAccountRequest struct {
 	Username string `validate:"required"`
 	Role     string `validate:"required,oneof=admin user"`
+	UserId   int32  `validate:"required"`
 }
 
-type ListUsersQueryParams struct {
+type ListAccountsQueryParams struct {
 	PageId   int32 `validate:"required,min=1"`
 	PageSize int32 `validate:"required,min=5,max=10"`
 }
 
-func (server *Server) listUsers(c *fiber.Ctx) error {
+func (server *Server) listAccounts(c *fiber.Ctx) error {
 	// TODO: Implement
-	var params ListUsersQueryParams
+	var params ListAccountsQueryParams
 	err := c.QueryParser(&params)
 	if err != nil {
 		c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
@@ -35,12 +36,12 @@ func (server *Server) listUsers(c *fiber.Ctx) error {
 		return err
 	}
 
-	args := db.ListUsersParams{
+	args := db.ListAccountsParams{
 		Limit:  params.PageSize,
 		Offset: (params.PageId - 1) * params.PageSize,
 	}
 
-	users, err := server.store.ListUsers(context.Background(), args)
+	users, err := server.store.ListAccounts(context.Background(), args)
 	if err != nil {
 		c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 		return err
@@ -55,8 +56,8 @@ func errorResponse(err error) fiber.Map {
 	return fiber.Map{"error": err.Error()}
 }
 
-func (server *Server) createUser(c *fiber.Ctx) error {
-	var req createUserRequest
+func (server *Server) createAccount(c *fiber.Ctx) error {
+	var req createAccountRequest
 	if err := c.BodyParser(&req); err != nil {
 		c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 		return err
@@ -67,12 +68,13 @@ func (server *Server) createUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	arg := db.CreateUserParams{
+	arg := db.CreateAccountParams{
 		Username: req.Username,
 		Role:     req.Role,
+		UserID:   req.UserId,
 	}
 
-	user, err := server.store.CreateUser(c.Context(), arg)
+	user, err := server.store.CreateAccount(c.Context(), arg)
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 		return err
@@ -83,14 +85,14 @@ func (server *Server) createUser(c *fiber.Ctx) error {
 
 }
 
-type getUserRequest struct {
-	ID int `validate:"required,min=1"`
+type getAccountRequest struct {
+	UserID int `validate:"required,min=1"`
 }
 
-func (server *Server) getUser(c *fiber.Ctx) error {
+func (server *Server) getAccount(c *fiber.Ctx) error {
 	// Parse URI params
-	var req getUserRequest
-	req.ID, _ = strconv.Atoi(c.Params("id"))
+	var req getAccountRequest
+	req.UserID, _ = strconv.Atoi(c.Params("id"))
 
 	// Validate request
 	if err := server.validator.Struct(req); err != nil {
@@ -100,7 +102,7 @@ func (server *Server) getUser(c *fiber.Ctx) error {
 	}
 
 	// Get user from database
-	user, err := server.store.GetUser(context.Background(), int64(req.ID))
+	user, err := server.store.GetAccount(context.Background(), int32(req.UserID))
 	if err != nil {
 
 		if err == sql.ErrNoRows {
@@ -116,10 +118,10 @@ func (server *Server) getUser(c *fiber.Ctx) error {
 	return nil
 }
 
-func (server *Server) deleteUser(c *fiber.Ctx) error {
+func (server *Server) deleteAccount(c *fiber.Ctx) error {
 	// Parse URI params
-	var req getUserRequest
-	req.ID, _ = strconv.Atoi(c.Params("id"))
+	var req getAccountRequest
+	req.UserID, _ = strconv.Atoi(c.Params("id"))
 
 	// Validate request
 	if err := server.validator.Struct(req); err != nil {
@@ -128,13 +130,13 @@ func (server *Server) deleteUser(c *fiber.Ctx) error {
 	}
 
 	// Get user from database
-	err := server.store.DeleteUser(context.Background(), int64(req.ID))
+	err := server.store.DeleteAccount(context.Background(), int32(req.UserID))
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 		return err
 	}
 
 	// Return user as JSON response
-	c.JSON(req.ID)
+	c.JSON(req.UserID)
 	return nil
 }
