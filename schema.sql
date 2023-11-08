@@ -1,37 +1,40 @@
 CREATE TABLE "follows" (
-  "following_user_id" integer NOT NULL,
-  "followed_user_id" integer NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT 'now()'
+  "following_user_id" integer,
+  "followed_user_id" integer,
+  "created_at" timestamp
 );
 
 CREATE TABLE "users" (
   "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
-  "role" varchar NOT NULL,
-  "reputation" integer NOT NULL DEFAULT 0,
-  "created_at" timestamp NOT NULL DEFAULT 'now()'
+  "password" varchar NOT NULL,
+  "email" varchar NOT NULL
+);
+
+CREATE TABLE "accounts" (
+  "id" bigserial PRIMARY KEY,
+  "user_id" integer,
+  "username" varchar,
+  "role" varchar,
+  "reputation" integer,
+  "created_at" timestamp
 );
 
 CREATE TABLE "posts" (
-  "id" bigserial PRIMARY KEY,
-  "title" varchar NOT NULL,
+  "id" integer PRIMARY KEY,
+  "title" varchar,
   "body" text,
-  "user_id" integer NOT NULL,
-  "status" varchar NOT NULL,
-  "likes" integer NOT NULL DEFAULT 0,
-  "created_at" timestamp NOT NULL DEFAULT 'now()'
+  "user_id" integer,
+  "status" varchar,
+  "created_at" timestamp
 );
-
-CREATE INDEX ON "follows" ("followed_user_id");
-
-CREATE INDEX ON "follows" ("following_user_id");
-
-CREATE INDEX ON "users" ("id");
 
 COMMENT ON COLUMN "posts"."body" IS 'Content of the post';
 
-ALTER TABLE "posts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "posts" ADD FOREIGN KEY ("user_id") REFERENCES "accounts" ("user_id");
 
-ALTER TABLE "follows" ADD FOREIGN KEY ("following_user_id") REFERENCES "users" ("id");
+ALTER TABLE "follows" ADD FOREIGN KEY ("following_user_id") REFERENCES "accounts" ("user_id");
 
-ALTER TABLE "follows" ADD FOREIGN KEY ("followed_user_id") REFERENCES "users" ("id");
+ALTER TABLE "follows" ADD FOREIGN KEY ("followed_user_id") REFERENCES "accounts" ("user_id");
+
+ALTER TABLE "users" ADD FOREIGN KEY ("id") REFERENCES "accounts" ("user_id");
