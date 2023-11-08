@@ -7,8 +7,8 @@ import (
 	"github.com/Shubham-Rasal/blog-backend/api"
 	db "github.com/Shubham-Rasal/blog-backend/db/sqlc"
 	"github.com/Shubham-Rasal/blog-backend/util"
-	_ "github.com/lib/pq"
 	_ "github.com/golang/mock/mockgen/model"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -24,7 +24,9 @@ func main() {
 		log.Fatal("cannot connect to db", err)
 	}
 	store := db.NewStore(DB)
-	server := api.NewServer(store)
+	server, err := api.NewServer(config, store)
+	if err != nil {
+		log.Fatal("cannot create server", err)
+	}
 	err = server.Start(config.ServerAddress)
-
 }

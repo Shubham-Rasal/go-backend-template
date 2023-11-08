@@ -113,7 +113,7 @@ Installation instructions can be found [here](https://github.com/golang-migrate/
 First we need to create a migration called init_schema. This migration will create the tables in the database. We can create this migration using the following command. Make a directory called `db/migration` and run the following command.
 
 ```bash
-./migrate create -ext sql -dir db/migration -seq init_schema -verbose
+migrate create -ext sql -dir db/migration -seq init_schema -verbose
 ```
 
 This will create a file called `db/migration/000001_init_schema.up.sql` and `db/migration/000001_init_schema.down.sql`. The up file will contain the commands to create the tables and the down file will contain the commands to drop the tables. 
@@ -548,6 +548,7 @@ In software testing, a mock object is a simulated object that mimics the behavio
 A stub is a type of mock object that returns a pre-determined response to a method call. Stubs are used to replace real objects in a test and provide a predictable response to the code being tested.
 
 In the provided code, `buildStubs` is a function that creates a mock object of the `store` and sets an expectation that the `GetUser` method will be called once with the `user.ID` as an argument. This mock object is used to test the getUserHandler function in isolation from the actual database.In software testing, a mock object is a simulated object that mimics the behavior of the real object in a controlled way. A mock object returns a specific pre-programmed response to a method call.
+
 
 
 
