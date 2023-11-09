@@ -47,7 +47,7 @@ func TestGetUser(t *testing.T) {
 
 	user1 := createDummyUser(t)
 
-	user2, err := testQueries.GetUser(context.Background(), user1.ID)
+	user2, err := testQueries.GetUserById(context.Background(), user1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, user2)
 
@@ -56,6 +56,14 @@ func TestGetUser(t *testing.T) {
 	require.Equal(t, user1.Email, user2.Email)
 	require.Equal(t, user1.Password, user2.Password)
 
+	//get by username
+	user3, err := testQueries.GetUserByUsername(context.Background(), user1.Username)
+	require.NoError(t, err)
+	require.NotEmpty(t, user3)
+	require.Equal(t, user1.ID, user3.ID)
+	require.Equal(t, user1.Username, user3.Username)
+	require.Equal(t, user1.Email, user3.Email)
+	require.Equal(t, user1.Password, user3.Password)
 }
 
 func TestListUsers(t *testing.T) {
@@ -90,7 +98,7 @@ func TestUpdateEmail(t *testing.T) {
 	require.NoError(t, err)
 
 	// Retrieve the updated user from the database
-	updatedUser, err := testQueries.GetUser(context.Background(), user.ID)
+	updatedUser, err := testQueries.GetUserById(context.Background(), user.ID)
 	require.NoError(t, err)
 
 	// Verify that the user's email has been updated
@@ -113,7 +121,7 @@ func TestUpdatePassword(t *testing.T) {
 	require.NoError(t, err)
 
 	// Retrieve the updated user from the database
-	updatedUser, err := testQueries.GetUser(context.Background(), user.ID)
+	updatedUser, err := testQueries.GetUserById(context.Background(), user.ID)
 	require.NoError(t, err)
 
 	// Verify that the user's password has been updated
@@ -129,7 +137,7 @@ func TestDeleteUser(t *testing.T) {
 	require.NoError(t, err)
 
 	// Try to retrieve the deleted user from the database
-	deletedUser, err := testQueries.GetUser(context.Background(), user.ID)
+	deletedUser, err := testQueries.GetUserById(context.Background(), user.ID)
 
 	// Verify that the user has been deleted
 	require.Error(t, err)

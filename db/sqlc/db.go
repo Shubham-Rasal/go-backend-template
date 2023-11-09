@@ -45,8 +45,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getPostStmt, err = db.PrepareContext(ctx, getPost); err != nil {
 		return nil, fmt.Errorf("error preparing query GetPost: %w", err)
 	}
-	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
-		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
+	if q.getUserByIdStmt, err = db.PrepareContext(ctx, getUserById); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserById: %w", err)
+	}
+	if q.getUserByUsernameStmt, err = db.PrepareContext(ctx, getUserByUsername); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserByUsername: %w", err)
 	}
 	if q.likePostStmt, err = db.PrepareContext(ctx, likePost); err != nil {
 		return nil, fmt.Errorf("error preparing query LikePost: %w", err)
@@ -109,9 +112,14 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getPostStmt: %w", cerr)
 		}
 	}
-	if q.getUserStmt != nil {
-		if cerr := q.getUserStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
+	if q.getUserByIdStmt != nil {
+		if cerr := q.getUserByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByIdStmt: %w", cerr)
+		}
+	}
+	if q.getUserByUsernameStmt != nil {
+		if cerr := q.getUserByUsernameStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByUsernameStmt: %w", cerr)
 		}
 	}
 	if q.likePostStmt != nil {
@@ -186,43 +194,45 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                   DBTX
-	tx                   *sql.Tx
-	createAccountStmt    *sql.Stmt
-	createPostStmt       *sql.Stmt
-	createUserStmt       *sql.Stmt
-	deleteAccountStmt    *sql.Stmt
-	deleteUserStmt       *sql.Stmt
-	getAccountStmt       *sql.Stmt
-	getPostStmt          *sql.Stmt
-	getUserStmt          *sql.Stmt
-	likePostStmt         *sql.Stmt
-	listAccountsStmt     *sql.Stmt
-	listPostsStmt        *sql.Stmt
-	listUsersStmt        *sql.Stmt
-	updateEmailStmt      *sql.Stmt
-	updatePasswordStmt   *sql.Stmt
-	updateReputationStmt *sql.Stmt
+	db                    DBTX
+	tx                    *sql.Tx
+	createAccountStmt     *sql.Stmt
+	createPostStmt        *sql.Stmt
+	createUserStmt        *sql.Stmt
+	deleteAccountStmt     *sql.Stmt
+	deleteUserStmt        *sql.Stmt
+	getAccountStmt        *sql.Stmt
+	getPostStmt           *sql.Stmt
+	getUserByIdStmt       *sql.Stmt
+	getUserByUsernameStmt *sql.Stmt
+	likePostStmt          *sql.Stmt
+	listAccountsStmt      *sql.Stmt
+	listPostsStmt         *sql.Stmt
+	listUsersStmt         *sql.Stmt
+	updateEmailStmt       *sql.Stmt
+	updatePasswordStmt    *sql.Stmt
+	updateReputationStmt  *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                   tx,
-		tx:                   tx,
-		createAccountStmt:    q.createAccountStmt,
-		createPostStmt:       q.createPostStmt,
-		createUserStmt:       q.createUserStmt,
-		deleteAccountStmt:    q.deleteAccountStmt,
-		deleteUserStmt:       q.deleteUserStmt,
-		getAccountStmt:       q.getAccountStmt,
-		getPostStmt:          q.getPostStmt,
-		getUserStmt:          q.getUserStmt,
-		likePostStmt:         q.likePostStmt,
-		listAccountsStmt:     q.listAccountsStmt,
-		listPostsStmt:        q.listPostsStmt,
-		listUsersStmt:        q.listUsersStmt,
-		updateEmailStmt:      q.updateEmailStmt,
-		updatePasswordStmt:   q.updatePasswordStmt,
-		updateReputationStmt: q.updateReputationStmt,
+		db:                    tx,
+		tx:                    tx,
+		createAccountStmt:     q.createAccountStmt,
+		createPostStmt:        q.createPostStmt,
+		createUserStmt:        q.createUserStmt,
+		deleteAccountStmt:     q.deleteAccountStmt,
+		deleteUserStmt:        q.deleteUserStmt,
+		getAccountStmt:        q.getAccountStmt,
+		getPostStmt:           q.getPostStmt,
+		getUserByIdStmt:       q.getUserByIdStmt,
+		getUserByUsernameStmt: q.getUserByUsernameStmt,
+		likePostStmt:          q.likePostStmt,
+		listAccountsStmt:      q.listAccountsStmt,
+		listPostsStmt:         q.listPostsStmt,
+		listUsersStmt:         q.listUsersStmt,
+		updateEmailStmt:       q.updateEmailStmt,
+		updatePasswordStmt:    q.updatePasswordStmt,
+		updateReputationStmt:  q.updateReputationStmt,
 	}
 }

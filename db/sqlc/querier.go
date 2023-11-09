@@ -16,7 +16,8 @@ type Querier interface {
 	DeleteUser(ctx context.Context, id int64) error
 	GetAccount(ctx context.Context, userID int32) (Account, error)
 	GetPost(ctx context.Context, id int64) (Post, error)
-	GetUser(ctx context.Context, id int64) (User, error)
+	GetUserById(ctx context.Context, id int64) (User, error)
+	GetUserByUsername(ctx context.Context, username string) (User, error)
 	LikePost(ctx context.Context, id int64) error
 	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
