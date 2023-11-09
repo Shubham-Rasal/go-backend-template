@@ -18,6 +18,7 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot load env", err)
 	}
+	log.Println("loaded config")
 
 	DB, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {

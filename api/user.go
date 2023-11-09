@@ -178,3 +178,47 @@ func (server *Server) deleteUser(c *fiber.Ctx) error {
 	c.JSON(req.UserID)
 	return nil
 }
+
+type loginUserRequest struct {
+	Username string `validate:"required,min=3,max=32"`
+	Password string `validate:"required,min=6,max=32"`
+}
+
+type loginUserResponse struct {
+	ID          int64  `json:"id"`
+	AccessToken string `json:"access_token"`
+}
+
+func (server *Server) loginUser(c *fiber.Ctx) error {
+	var req loginUserRequest
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	if err := server.validator.Struct(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	user, err := server.store.GetUserByUsername(context.Background(), req.Username)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+
+	if user.Password != req.Password {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(fmt.Errorf("invalid password")))
+	}
+
+	accessToken, err := server.tokenMaker.CreateToken(req.Username, server.config.AccessDuration)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+
+	response := loginUserResponse{
+		ID:          user.ID,
+		AccessToken: accessToken,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+
+}
