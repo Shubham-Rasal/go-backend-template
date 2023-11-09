@@ -1,6 +1,6 @@
---add username as primary key
--- ALTER TABLE users DROP CONSTRAINT users_pkey;
+ALTER TABLE "posts" DROP CONSTRAINT "posts_user_id_fkey";
 
--- Path: db/migration/000007_update_pk_username.up.sql
---add username as primary key
--- ALTER TABLE 
+ALTER TABLE "follows" DROP CONSTRAINT "follows_followed_user_id_fkey";
+
+ALTER TABLE "follows" DROP CONSTRAINT "follows_following_user_id_fkey";
+

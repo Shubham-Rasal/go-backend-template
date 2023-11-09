@@ -1,9 +1,3 @@
-ALTER TABLE "follows" DROP CONSTRAINT "follows_followed_user_id_fkey";
-
-ALTER TABLE "follows" DROP CONSTRAINT "follows_following_user_id_fkey";
-
-ALTER TABLE "posts" DROP CONSTRAINT "posts_user_id_fkey";
-
 ALTER TABLE "posts" ADD FOREIGN KEY ("user_id") REFERENCES "accounts" ("id");
 
 ALTER TABLE "follows" ADD FOREIGN KEY ("followed_user_id") REFERENCES "accounts" ("id");
