@@ -54,7 +54,7 @@ func TestDeleteAccount(t *testing.T) {
 	account1, err := testQueries.CreateAccount(context.Background(), arg)
 	err = testQueries.DeleteUser(context.Background(), account1.ID)
 	require.NoError(t, err)
-	account2, err := testQueries.GetUser(context.Background(), account1.ID)
+	account2, err := testQueries.GetUserById(context.Background(), account1.ID)
 	require.Error(t, err)
 	require.Empty(t, account2)
 }
