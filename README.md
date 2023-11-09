@@ -470,9 +470,7 @@ Due to simplicity of paseto and its security features, I have used it for authen
 NOTE: It can be easily replaced by JWT by changing the `Maker` interface and the `NewPasetoMaker` function.
 
 
-
-
-### Middlewares
+### Validation
 
 We use a library called [validator](https://github.com/go-playground/validator) for input validation.
 It uses tags to figure out the correct field in input and output params.
@@ -509,6 +507,26 @@ All global variables like `serverAddress` , `dbSource` are replace by environmen
 These are loaded using a utility called [viper](https://github.com/spf13/viper).
 
 One cool feature I like about the viper setup is that the env variables are loaded into a struct which makes it really easy for auto-complete and interllisense.
+
+### Middleware
+
+Middlewares are used to intercept requests and responses. You can read more about it [here](https://docs.gofiber.io/guide/middleware).
+
+You can add various features using middleware like logging, authentication, tracing, etc.
+
+Since we are using fiber, the middleware creation is super easy. We can create a middleware for authentication as follows.
+
+```go
+
+func Protected(tokenMaker token.Maker) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		//do your auth or any other stuff 
+		return ctx.Next()
+	}
+}
+```
+
+
 
 
 ## Mock DB
