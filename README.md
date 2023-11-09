@@ -1,4 +1,27 @@
-ackend System Development
+# Backend System Development
+
+## Table of Contents
+
+- [Backend System Development](#backend-system-development)
+	- [Table of Contents](#table-of-contents)
+	- [Database Schema Generation (Postrgesql)](#database-schema-generation-postrgesql)
+	- [Getting a Postgresql Database (Docker)](#getting-a-postgresql-database-docker)
+	- [Makefile](#makefile)
+	- [TablePlus](#tableplus)
+	- [Database Schema Migration](#database-schema-migration)
+	- [Generate code from SQL](#generate-code-from-sql)
+		- [sqlc](#sqlc)
+	- [Testing the generated code](#testing-the-generated-code)
+	- [Continuous Integration](#continuous-integration)
+	- [Rest API using go fiber](#rest-api-using-go-fiber)
+		- [Routes and Handlers](#routes-and-handlers)
+		- [Authentication using JWT and PASETO](#authentication-using-jwt-and-paseto)
+			- [JWT](#jwt)
+			- [PASETO](#paseto)
+		- [Validation](#validation)
+	- [Environment variables](#environment-variables)
+		- [Middleware](#middleware)
+	- [Mock DB](#mock-db)
 
 ## Database Schema Generation (Postrgesql)
 
