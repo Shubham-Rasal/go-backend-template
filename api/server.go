@@ -11,6 +11,7 @@ import (
 )
 
 type Server struct {
+	config     util.Config
 	store      db.Store
 	router     *fiber.App
 	validator  *validator.Validate
@@ -25,11 +26,20 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 	}
 
 	server := &Server{
+		config:     config,
 		tokenMaker: tokenMaker,
 		store:      store,
 		validator:  validator.New(validator.WithRequiredStructEnabled()),
 	}
+	server.SetupRouter()
+	return server, nil
+}
 
+func (server *Server) Start(address string) error {
+	return server.router.Listen(address)
+}
+
+func (server *Server) SetupRouter() {
 	router := fiber.New()
 
 	router.Get("/accounts", server.listAccounts)
@@ -41,6 +51,7 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 	router.Post("/users", server.createUser)
 	router.Get("/users/:username", server.getUserByUsername)
 	router.Delete("/users/:id", server.deleteUser)
+	router.Post("/users/login", server.loginUser)
 
 	router.Post("/posts", server.createPost)
 	router.Get("/posts/:id", server.getPost)
@@ -48,9 +59,4 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 	router.Post("/posts/:id/like", server.likePost)
 
 	server.router = router
-	return server, nil
-}
-
-func (server *Server) Start(address string) error {
-	return server.router.Listen(address)
 }
