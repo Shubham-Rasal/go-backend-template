@@ -20,7 +20,7 @@ type Server struct {
 
 func NewServer(config util.Config, store db.Store) (*Server, error) {
 
-	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
 	if err != nil {
 		return nil, fmt.Errorf("connot create token maker : %w", err)
 	}
@@ -42,10 +42,12 @@ func (server *Server) Start(address string) error {
 func (server *Server) SetupRouter() {
 	router := fiber.New()
 
-	router.Get("/accounts", server.listAccounts)
-	router.Post("/accounts", server.createAccount)
-	router.Get("/accounts/:id", server.getAccount)
-	router.Delete("/accounts/:id", server.deleteAccount)
+	authRouter := router.Group("/accounts", Protected(server.tokenMaker))
+
+	authRouter.Get("/", server.listAccounts)
+	authRouter.Post("/", server.createAccount)
+	authRouter.Get("/:id", server.getAccount)
+	authRouter.Delete("/:id", server.deleteAccount)
 
 	router.Get("/users", server.listUsers)
 	router.Post("/users", server.createUser)
