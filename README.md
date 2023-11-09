@@ -410,11 +410,66 @@ type Server struct {
 
 ```
 
+The `store` field is used to interact with the database. The `router` field is used to create routes and handlers. The `validator` field is used to validate the input and output parameters.
+
+
+
 NOTE: To test the APIs, following tools can be used
 
 - postman
 - thunderclient (vscode extension)
 - cURL
+
+### Authentication using JWT and PASETO
+
+You can read more about JWT [here](https://jwt.io/) and PASETO [here](https://paseto.io/).
+
+#### JWT
+
+JWT stands for JSON Web Token. It is an open standard that defines a compact and self-contained way for securely transmitting information between parties as a JSON object. This information can be verified and trusted because it is digitally signed.
+
+JWTs can be signed using a secret (with the HMAC algorithm) or a public/private key pair using RSA or ECDSA. 
+
+#### PASETO
+
+PASETO stands for Platform-Agnostic Security Tokens. It is a specification and reference implementation for secure stateless tokens. It is a more secure alternative to JWT.
+
+PASETO is a secure alternative to the JOSE standards (JWT, JWE, JWS) and can be used in a wide variety of use cases. It is a secure alternative to JWT.
+
+I have implementated both using a common interface `Maker` which has the following features:
+
+```go
+
+type Maker interface {
+	CreateToken(username string, duration time.Duration) (string, error)
+	VerifyToken(token string) (*Payload, error)
+}
+
+```
+
+Any struct which implements this interface can be used to create and verify tokens. The `CreateToken` method is used to create a token for a given username and duration. The `VerifyToken` method is used to verify a token and return the payload.
+
+The `Maker` interface is implemented by two structs, `JWTMaker` and `PasetoMaker`. The `JWTMaker` struct is used to create and verify JWT tokens. The `PasetoMaker` struct is used to create and verify PASETO tokens.
+
+```go
+
+type JWTMaker struct {
+	secretKey string
+}
+
+type PasetoMaker struct {
+	pasetoKey string
+}
+
+```
+
+The `secretKey` field is used to sign the JWT token. The `pasetoKey` field is used to sign the PASETO token.
+
+Due to simplicity of paseto and its security features, I have used it for authentication.
+
+NOTE: It can be easily replaced by JWT by changing the `Maker` interface and the `NewPasetoMaker` function.
+
+
 
 
 ### Middlewares

@@ -1,6 +1,7 @@
 package token
 
 import (
+	"log"
 	"testing"
 	"time"
 
@@ -9,11 +10,13 @@ import (
 )
 
 func TestPasetoMaker(t *testing.T) {
-	maker, err := NewPasetoMaker(util.RandomString(32))
+	key := util.RandomString(32)
+	maker, err := NewPasetoMaker(key)
+	log.Println(key)
 	require.NoError(t, err)
 	require.NotEmpty(t, maker)
 
-	maker1, err := NewPasetoMaker("df")
+	maker1, err := NewPasetoMaker("dsfdfsd")
 	require.Error(t, err)
 	require.Empty(t, maker1)
 

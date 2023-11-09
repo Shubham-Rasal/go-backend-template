@@ -30,7 +30,7 @@ func TestCreateUser(t *testing.T) {
 
 	arg := CreateUserParams{
 		Username: util.RandomString(4),
-		Password: util.RandomString(6),
+		Password: util.RandomString(32),
 		Email:    util.RandomEmail(),
 	}
 
