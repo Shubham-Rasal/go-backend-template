@@ -101,8 +101,20 @@ func (server *Server) getAccount(c *fiber.Ctx) error {
 		// return err
 	}
 
+	//get the username from header
+	username := c.Locals("username").(string)
+
+	caller, err := server.store.GetUserByUsername(context.Background(), username)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+
+	if caller.ID != int64(req.UserID) {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(fmt.Errorf("unauthorized: you are not allowed to access this account")))
+	}
+
 	// Get user from database
-	user, err := server.store.GetAccount(context.Background(), int32(req.UserID))
+	account, err := server.store.GetAccount(context.Background(), int32(req.UserID))
 	if err != nil {
 
 		if err == sql.ErrNoRows {
@@ -114,7 +126,7 @@ func (server *Server) getAccount(c *fiber.Ctx) error {
 	}
 
 	// Return user as JSON response
-	c.JSON(user)
+	c.JSON(account)
 	return nil
 }
 
