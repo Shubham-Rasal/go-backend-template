@@ -5,8 +5,8 @@ CREATE TABLE "follows" (
 );
 
 CREATE TABLE "users" (
-  "id" bigserial PRIMARY KEY,
-  "username" varchar NOT NULL,
+  "id" bigserial NOT NULL UNIQUE,
+  "username" varchar PRIMARY KEY,
   "password" varchar NOT NULL,
   "email" varchar NOT NULL
 );

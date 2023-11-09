@@ -2,8 +2,8 @@ ALTER TABLE "users" RENAME TO "accounts";
 ALTER TABLE "accounts" ADD COLUMN "user_id" integer unique not null;
 
 CREATE TABLE "users" (
-  "id" bigserial PRIMARY KEY,
-  "username" varchar NOT NULL,
+  "id" bigserial NOT NULL UNIQUE,
+  "username" varchar PRIMARY KEY,
   "password" varchar NOT NULL,
   "email" varchar NOT NULL
 );
