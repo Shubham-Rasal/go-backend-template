@@ -57,7 +57,7 @@ jobs:
         which migrate
     
     - name: Run migrations
-      run: make migrateup step=3
+      run: make migrateup
 
     - name: Test
       run: ENV=ci make test
