@@ -19,6 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: CI
+    
+    env:
+      DB_DRIVER: ${{secrets.DB_DRIVER}}
+
     # services:
     #   postgres:
     #     image: postgres:16-bookworm
@@ -56,4 +60,4 @@ jobs:
 
     - name: Echo Env
       run: |
-        echo ${{ secrets.DB_DRIVER }}} is the driver
+        echo $DB_DRIVER
