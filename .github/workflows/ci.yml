@@ -56,8 +56,4 @@ jobs:
 
     - name: Echo Env
       run: |
-        echo ${{ secrets.DB_DRIVER }}}
-        echo ${{ secrets.DB_SOURCE}}
-        echo ${{ secrets.SERVER_ADDRESS}}
-        echo ${{ secrets.ACCESS_TOKEN_DURATION}}
-        echo ${{ secrets.TOKEN_SYMMETRIC_KEY}}
+        echo ${{ secrets.DB_DRIVER }}} is the driver
