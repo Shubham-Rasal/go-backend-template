@@ -49,4 +49,4 @@ jobs:
       run: make migrateup step=3
 
     - name: Test
-      run: make test
+      run: ENV=ci make test
