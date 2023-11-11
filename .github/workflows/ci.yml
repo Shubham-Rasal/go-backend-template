@@ -11,18 +11,14 @@ on:
   pull_request:
     branches: [ "master" ]
 
-env: 
-  DB_DRIVER: ${{ secrets.DB_DRIVER }}
-  DB_SOURCE: ${{ secrets.DB_SOURCE }}
-  SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
-  TOKEN_SYMMETRIC_KEY: ${{ secrets.TOKEN_SYMMETRIC_KEY }}
-  ACCESS_TOKEN_DURATION: ${{ secrets.ACCESS_TOKEN_DURATION }}
-    
+   
 jobs:
 
   test:
     name: Test
     runs-on: ubuntu-latest
+    environment:
+      name: CI
     # services:
     #   postgres:
     #     image: postgres:16-bookworm
@@ -60,8 +56,8 @@ jobs:
 
     - name: Echo Env
       run: |
-        echo $DB_DRIVER
-        echo $DB_SOURCE
-        echo $SERVER_ADDRESS
-        echo $TOKEN_SYMMETRIC_KEY
-        echo $ACCESS_TOKEN_DURATION
+        echo ${{ secrets.DB_DRIVER }}}
+        echo ${{ secrets.DB_SOURCE}}
+        echo ${{ secrets.SERVER_ADDRESS}}
+        echo ${{ secrets.ACCESS_TOKEN_DURATION}}
+        echo ${{ secrets.TOKEN_SYMMETRIC_KEY}}
