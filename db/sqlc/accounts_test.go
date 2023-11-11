@@ -13,7 +13,7 @@ func TestCreateAccount(t *testing.T) {
 	user := createDummyUser(t)
 
 	arg := CreateAccountParams{
-		Username: util.RandomUserName(),
+		Username: user.Username,
 		Role:     util.RandomRole(),
 		UserID:   int32(user.ID),
 	}
@@ -29,7 +29,7 @@ func TestGetAccount(t *testing.T) {
 	user := createDummyUser(t)
 
 	arg := CreateAccountParams{
-		Username: util.RandomUserName(),
+		Username: user.Username,
 		Role:     util.RandomRole(),
 		UserID:   int32(user.ID),
 	}
@@ -46,7 +46,7 @@ func TestDeleteAccount(t *testing.T) {
 	user := createDummyUser(t)
 
 	arg := CreateAccountParams{
-		Username: util.RandomUserName(),
+		Username: user.Username,
 		Role:     util.RandomRole(),
 		UserID:   int32(user.ID),
 	}
@@ -64,7 +64,7 @@ func TestListAccounts(t *testing.T) {
 		user := createDummyUser(t)
 
 		arg := CreateAccountParams{
-			Username: util.RandomUserName(),
+			Username: user.Username,
 			Role:     util.RandomRole(),
 			UserID:   int32(user.ID),
 		}
@@ -87,7 +87,7 @@ func TestUpdateUser(t *testing.T) {
 	user := createDummyUser(t)
 
 	arg := CreateAccountParams{
-		Username: util.RandomUserName(),
+		Username: user.Username,
 		Role:     util.RandomRole(),
 		UserID:   int32(user.ID),
 	}

@@ -32,7 +32,7 @@ sqlc:
 	sqlc generate
 
 test:
-	go test  -cover ./...
+	go test  -count=1 -timeout 30s -p 1 ./...
 
 server:
 	go run main.go
