@@ -22,42 +22,43 @@ jobs:
     
     env:
       DB_DRIVER: ${{secrets.DB_DRIVER}}
+      DB_SOURCE: ${{secrets.DB_SOURCE}}
+      SERVER_ADDRESS: ${{secrets.SERVER_ADDRESS}}
+      TOKEN_SYMMETRIC_KEY: ${{secrets.TOKEN_SYMMETRIC_KEY}}
+      ACCESS_TOKEN_DURATION: ${{secrets.ACCESS_TOKEN_DURATION}}
 
-    # services:
-    #   postgres:
-    #     image: postgres:16-bookworm
-    #     env:
-    #       POSTGRES_PASSWORD: password
-    #       POSTGRES_USER: root
-    #       POSTGRES_DB: blog
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 5s
-    #       --health-timeout 3s
-    #       --health-retries 3
-    #     ports:
-    #       # Maps tcp port 5432 on service container to the host
-    #       - 5432:5432
+    services:
+      postgres:
+        image: postgres:16-bookworm
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: root
+          POSTGRES_DB: blog
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 3
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
     steps:
-    # - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-    # - name: Set up Go
-    #   uses: actions/setup-go@v4
-    #   with:
-    #     go-version: '^1.20'
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '^1.20'
     
-    # - name: Install Migration Tool
-    #   run: |
-    #     curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/migrate.linux-amd64.tar.gz | tar xvz
-    #     mv migrate /usr/local/bin/
-    #     which migrate
-    
-    # - name: Run migrations
-    #   run: make migrateup step=3
-
-    # - name: Test
-    #   run: ENV=ci make test
-
-    - name: Echo Env
+    - name: Install Migration Tool
       run: |
-        echo $DB_DRIVER
+        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/migrate.linux-amd64.tar.gz | tar xvz
+        mv migrate /usr/local/bin/
+        which migrate
+    
+    - name: Run migrations
+      run: make migrateup step=3
+
+    - name: Test
+      run: ENV=ci make test
+
