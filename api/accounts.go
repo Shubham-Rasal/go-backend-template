@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"strconv"
 
 	db "github.com/Shubham-Rasal/blog-backend/db/sqlc"
@@ -96,7 +97,7 @@ func (server *Server) getAccount(c *fiber.Ctx) error {
 
 	// Validate request
 	if err := server.validator.Struct(req); err != nil {
-		fmt.Print("validation err : ", err)
+		log.Print("validation error : ", err)
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 		// return err
 	}
