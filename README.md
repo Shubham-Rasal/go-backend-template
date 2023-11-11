@@ -22,6 +22,7 @@
 	- [Environment variables](#environment-variables)
 		- [Middleware](#middleware)
 	- [Mock DB](#mock-db)
+	- [Dockerisation](#dockerisation)
 
 ## Database Schema Generation (Postrgesql)
 
@@ -548,8 +549,18 @@ func Protected(tokenMaker token.Maker) fiber.Handler {
 	}
 }
 ```
+ The auth middleware helps you to set the user in the context of the request. This can be used to get the user in the handler. This is done by using the `ctx.Locals` method.
 
+ ```go
 
+	// some stuff
+	user := ctx.Locals("user").(*jwt.Token)
+// other stuff
+
+ ```
+
+ This can used in the handlers to check if this user is allowed to perform the action or not.
+This is called authorization.
 
 
 ## Mock DB
@@ -647,6 +658,7 @@ In the provided code, `buildStubs` is a function that creates a mock object of t
 
 
 
+## Dockerisation
 
 
 
