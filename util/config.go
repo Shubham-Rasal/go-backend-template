@@ -21,8 +21,14 @@ func LoadConfig(path string) (config Config, err error) {
 	//if ci then load config from environment variables
 	//else load config from .env file
 	viper.BindEnv("ENV")
+	viper.BindEnv("DB_DRIVER")
+	viper.BindEnv("DB_SOURCE")
+	viper.BindEnv("SERVER_ADDRESS")
+	viper.BindEnv("TOKEN_SYMMETRIC_KEY")
+	viper.BindEnv("ACCESS_TOKEN_DURATION")
 	env := viper.GetString("ENV")
 	log.Println("ENV : ", env)
+	log.Println("dbdriver : ", viper.GetString("DB_DRIVER"))
 	if env == "ci" {
 		viper.AutomaticEnv()
 		err = viper.Unmarshal(&config)
