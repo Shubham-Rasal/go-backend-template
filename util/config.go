@@ -20,8 +20,9 @@ func LoadConfig(path string) (config Config, err error) {
 	//check if ENV variable is set to ci or local
 	//if ci then load config from environment variables
 	//else load config from .env file
-
+	viper.BindEnv("ENV")
 	env := viper.GetString("ENV")
+	log.Println("ENV : ", env)
 	if env == "ci" {
 		viper.AutomaticEnv()
 		err = viper.Unmarshal(&config)
