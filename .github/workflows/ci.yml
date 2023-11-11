@@ -20,9 +20,9 @@ jobs:
       postgres:
         image: postgres:16-bookworm
         env:
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: root
+          POSTGRES_DB: blog
         options: >-
           --health-cmd pg_isready
           --health-interval 5s
