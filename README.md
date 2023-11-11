@@ -662,5 +662,6 @@ In the provided code, `buildStubs` is a function that creates a mock object of t
 
 
 
+![Docker Multistage Build](image-1.png) 
 
 
