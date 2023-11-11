@@ -1,6 +1,7 @@
 package util
 
 import (
+	"log"
 	"time"
 
 	"github.com/spf13/viper"
@@ -16,10 +17,21 @@ type Config struct {
 
 func LoadConfig(path string) (config Config, err error) {
 
+	//check if ENV variable is set to ci or local
+	//if ci then load config from environment variables
+	//else load config from .env file
+
+	env := viper.GetString("ENV")
+	if env == "ci" {
+		viper.AutomaticEnv()
+		err = viper.Unmarshal(&config)
+		return
+	}
+
+	log.Println("loading config from .env file")
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
-
 	viper.AutomaticEnv()
 
 	err = viper.ReadInConfig()

@@ -32,6 +32,7 @@ sqlc:
 	sqlc generate
 
 test:
+	# pass env for chekcing ci, local or prod 
 	go test -v -cover ./...
 
 server:
