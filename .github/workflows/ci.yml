@@ -10,7 +10,14 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-  
+
+env: 
+  DB_DRIVER: ${{ secrets.DB_DRIVER }}
+  DB_SOURCE: ${{ secrets.DB_SOURCE }}
+  SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
+  TOKEN_SYMMETRIC_KEY: ${{ secrets.TOKEN_SYMMETRIC_KEY }}
+  ACCESS_TOKEN_DURATION: ${{ secrets.ACCESS_TOKEN_DURATION }}
+    
 jobs:
 
   test:
