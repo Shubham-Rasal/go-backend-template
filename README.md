@@ -23,6 +23,9 @@
 		- [Middleware](#middleware)
 	- [Mock DB](#mock-db)
 	- [Dockerisation](#dockerisation)
+		- [Why Docker?](#why-docker)
+		- [Multistage Build](#multistage-build)
+		- [Docker networking](#docker-networking)
 
 ## Database Schema Generation (Postrgesql)
 
@@ -660,8 +663,76 @@ In the provided code, `buildStubs` is a function that creates a mock object of t
 
 ## Dockerisation
 
-
-
 ![Docker Multistage Build](image-1.png) 
 
+### Why Docker?
 
+Docker is a tool designed to make it easier to create, deploy, and run applications by using containers. Containers allow a developer to package up an application with all of the parts it needs, such as libraries and other dependencies, and deploy it as one package.
+
+### Multistage Build
+
+Since golang compiler and all the dependencies are required to run the application, we need to create a docker image with all the dependencies. But this image will be very large in size. So we use a multistage build to create a smaller image.
+
+The first stage is used to build the application. The second stage is used to run the application. The second stage does not contain the compiler and the dependencies. It only contains the binary and the required dependencies.
+
+The Dockerfile for the application is as follows.
+
+```Dockerfile
+
+#Build stage
+FROM golang:1.21.4-alpine3.18 AS builder
+
+WORKDIR /app
+
+COPY . .
+
+RUN go build -o main main.go
+
+#Final stage
+FROM alpine:3.18
+
+WORKDIR /app
+
+COPY --from=builder /app/main .
+
+# cpy the app.env file to the container
+COPY --from=builder /app/app.env .
+
+EXPOSE 8080
+
+CMD ["/app/main"]
+
+```
+
+The first stage uses the golang:1.21.4-alpine3.18 image. This image contains the golang compiler and the dependencies required to build the application. The WORKDIR instruction sets the working directory to /app. The COPY instruction copies all the files from the current directory to the /app directory in the container. The RUN instruction runs the go build command to build the application. The -o flag is used to specify the name of the output file. The CMD instruction specifies the command to run when the container starts.
+
+### Docker networking
+
+Notes on docker networking can be found [here](Notes.md/#docker-network).
+
+First create a network `blognet` -
+
+```bash
+
+docker network create blognet
+
+```
+
+Modify the creatpg command in the Makefile to add the network flag.
+
+```Makefile
+
+createpg:
+	docker run --name some-postgres --network blognet -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:16-bookworm
+
+```
+
+While making a container out of the image, we need to add the network flag.
+
+```bash
+
+docker run --network blognet --name blog-backend -p 8080:8080 -e DB_SOURCE="postgresql://root:password@some-postgres:5432/blog?sslmode=disable" blog-backend:latest
+
+```
+
+Note: since both the containers are on the same network, we can use the container name as the host name in the connection string.

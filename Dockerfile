@@ -14,6 +14,9 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 
+# cpy the app.env file to the container
+COPY --from=builder /app/app.env .
+
 EXPOSE 8080
 
 CMD ["/app/main"]
