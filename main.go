@@ -16,7 +16,7 @@ func main() {
 	//load config
 	config, err := util.LoadConfig(".")
 	if err != nil {
-		log.Fatal("cannot load env", err)
+		log.Fatal("cannot load env : ", err)
 	}
 	log.Println("loaded config")
 
