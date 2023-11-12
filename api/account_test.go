@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"testing"
+	"time"
 
 	mockdb "github.com/Shubham-Rasal/blog-backend/db/mock"
 	db "github.com/Shubham-Rasal/blog-backend/db/sqlc"
+	"github.com/Shubham-Rasal/blog-backend/token"
 	"github.com/Shubham-Rasal/blog-backend/util"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -17,12 +20,14 @@ import (
 
 func TestGetAccountAPI(t *testing.T) {
 
-	account := crateRandomAccount()
+	user := createRandomUser()
+	account := crateRandomAccount(user)
 
 	testcases := []struct {
 		name          string
 		userId        int64
 		buildStubs    func(store *mockdb.MockStore)
+		setupAuth     func(t *testing.T, tokenMaker token.Maker, request *http.Request)
 		checkResponse func(t *testing.T, response *http.Response)
 	}{
 		{
@@ -30,6 +35,10 @@ func TestGetAccountAPI(t *testing.T) {
 			userId: int64(account.UserID),
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.UserID)).Times(1).Return(account, nil)
+				store.EXPECT().GetUserByUsername(gomock.Any(), gomock.Eq(account.Username)).Times(1).Return(user, nil)
+			},
+			setupAuth: func(t *testing.T, tokenMaker token.Maker, request *http.Request) {
+				addAuth(t, tokenMaker, request, "Bearer", user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, response *http.Response) {
 				require.Equal(t, http.StatusOK, response.StatusCode)
@@ -41,6 +50,10 @@ func TestGetAccountAPI(t *testing.T) {
 			userId: 0,
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().GetAccount(gomock.Any(), gomock.Any()).Times(0)
+				store.EXPECT().GetUserByUsername(gomock.Any(), gomock.Any()).Times(0)
+			},
+			setupAuth: func(t *testing.T, tokenMaker token.Maker, request *http.Request) {
+				addAuth(t, tokenMaker, request, "Bearer", user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, response *http.Response) {
 				require.Equal(t, http.StatusBadRequest, response.StatusCode)
@@ -51,6 +64,10 @@ func TestGetAccountAPI(t *testing.T) {
 			userId: int64(account.UserID),
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.UserID)).Times(1).Return(db.Account{}, sql.ErrNoRows)
+				store.EXPECT().GetUserByUsername(gomock.Any(), gomock.Eq(account.Username)).Times(1).Return(user, nil)
+			},
+			setupAuth: func(t *testing.T, tokenMaker token.Maker, request *http.Request) {
+				addAuth(t, tokenMaker, request, "Bearer", user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, response *http.Response) {
 				require.Equal(t, http.StatusNotFound, response.StatusCode)
@@ -61,6 +78,11 @@ func TestGetAccountAPI(t *testing.T) {
 			userId: int64(account.UserID),
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.UserID)).Times(1).Return(db.Account{}, sql.ErrConnDone)
+				store.EXPECT().GetUserByUsername(gomock.Any(), gomock.Eq(account.Username)).Times(1).Return(user, nil)
+
+			},
+			setupAuth: func(t *testing.T, tokenMaker token.Maker, request *http.Request) {
+				addAuth(t, tokenMaker, request, "Bearer", user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, response *http.Response) {
 				require.Equal(t, http.StatusInternalServerError, response.StatusCode)
@@ -86,8 +108,9 @@ func TestGetAccountAPI(t *testing.T) {
 
 			url := fmt.Sprintf("/accounts/%d", testcase.userId)
 
-			req, err := http.NewRequest(http.MethodGet, url, nil)
-			require.NoError(t, err)
+			req := httptest.NewRequest(http.MethodGet, url, nil)
+			require.NotEmpty(t, req)
+			testcase.setupAuth(t, server.tokenMaker, req)
 
 			response, err := server.router.Test(req)
 			require.NoError(t, err)
@@ -97,12 +120,12 @@ func TestGetAccountAPI(t *testing.T) {
 
 }
 
-func crateRandomAccount() db.Account {
+func crateRandomAccount(user db.User) db.Account {
 	return db.Account{
-		Username: util.RandomUserName(),
+		Username: user.Username,
 		Role:     util.RandomRole(),
 		ID:       int64(util.RandomInt(1, 1000)),
-		UserID:   int32(util.RandomInt(1, 1000)),
+		UserID:   int32(user.ID),
 	}
 }
 

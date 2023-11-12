@@ -11,11 +11,22 @@ on:
   pull_request:
     branches: [ "master" ]
 
+   
 jobs:
 
   test:
     name: Test
     runs-on: ubuntu-latest
+    environment:
+      name: CI
+    
+    env:
+      DB_DRIVER: ${{secrets.DB_DRIVER}}
+      DB_SOURCE: ${{secrets.DB_SOURCE}}
+      SERVER_ADDRESS: ${{secrets.SERVER_ADDRESS}}
+      TOKEN_SYMMETRIC_KEY: ${{secrets.TOKEN_SYMMETRIC_KEY}}
+      ACCESS_TOKEN_DURATION: ${{secrets.ACCESS_TOKEN_DURATION}}
+
     services:
       postgres:
         image: postgres:16-bookworm
@@ -46,7 +57,8 @@ jobs:
         which migrate
     
     - name: Run migrations
-      run: make migrateup step=3
+      run: make migrateup
 
     - name: Test
-      run: make test
+      run: ENV=ci make test
+

@@ -13,7 +13,7 @@ func createRandomPost(t *testing.T) Post {
 	user := createDummyUser(t)
 
 	accountDetails := CreateAccountParams{
-		Username: util.RandomUserName(),
+		Username: user.Username,
 		Role:     util.RandomRole(),
 		UserID:   int32(user.ID),
 	}

@@ -15,11 +15,9 @@ func TestLikeTrasaction(t *testing.T) {
 	//create 5 users
 	var accounts []Account
 	for i := 0; i < 5; i++ {
-
 		user := createDummyUser(t)
-
 		arg := CreateAccountParams{
-			Username: util.RandomUserName(),
+			Username: user.Username,
 			Role:     util.RandomRole(),
 			UserID:   int32(user.ID),
 		}
