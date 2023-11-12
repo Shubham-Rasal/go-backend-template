@@ -54,3 +54,39 @@ ALTER TABLE posts DROP COLUMN likes;
 
 
 I think the best way to get into OS is to use a bunch of projects, packages and tools. When you use them, you will find bugs, missing features, and other things that you can fix.``
+
+
+## Docker network
+
+The container are running on different networks. So they can't communicate with each other.
+We can connect them using the following ways
+- using ip address of the container
+- using docker network
+- using docker compose
+
+### Using ip address of the container
+
+```bash
+
+docker inspect <container_name> | grep "IPAddress"
+```
+
+For postgress, you can use this in the connection string.
+
+### Using docker network
+
+```bash
+
+doker network create <network_name>
+```
+
+```bash 
+
+docker network connect <network_name> <container_name>
+```
+
+```bash
+
+docker network inspect <network_name>
+```
+
