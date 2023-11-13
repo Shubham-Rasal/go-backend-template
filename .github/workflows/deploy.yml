@@ -9,12 +9,20 @@ on:
   push:
     branches: [ "master" ]
   
-   
+    
 jobs:
 
   build:
     name: Build Image
     runs-on: ubuntu-latest
+    environment: CI
+
+    env:
+      DB_DRIVER: ${{ secrets.DB_DRIVER }}
+      DB_SOURCE: ${{ secrets.DB_SOURCE }}
+      SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
+      TOKEN_SYMMETRIC_KEY: ${{ secrets.TOKEN_SYMMETRIC_KEY }}
+      ACCESS_TOKEN_DURATION: ${{ secrets.ACCESS_TOKEN_DURATION }}
     
     steps:
       - name: Checkout repo
@@ -30,6 +38,14 @@ jobs:
       - name: Login to Amazon ECR Private
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Load environtment variables to app.env from github secrets
+        run: |
+            echo "DB_DRIVER=$DB_DRIVER" >> app.env
+            echo "DB_SOURCE=$DB_SOURCE" >> app.env
+            echo "SERVER_ADDRESS=$SERVER_ADDRESS" >> app.env
+            echo "TOKEN_SYMMETRIC_KEY=$TOKEN_SYMMETRIC_KEY" >> app.env
+            echo "ACCESS_TOKEN_DURATION=$ACCESS_TOKEN_DURATION" >> app.env
 
 
       - name: Build, tag, and push docker image to Amazon ECR Private

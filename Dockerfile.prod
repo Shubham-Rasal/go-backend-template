@@ -27,7 +27,7 @@ COPY --from=builder /app/start.sh .
 RUN chmod +x start.sh
 
 # cpy the app.env file to the container
-# COPY --from=builder /app/app.env .
+COPY --from=builder /app/app.env .
 COPY --from=builder /app/db/migration ./migration
 
 EXPOSE 8080
