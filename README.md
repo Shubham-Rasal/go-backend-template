@@ -49,7 +49,7 @@ We will use Docker to run Postgresql. You can install Docker from [here](https:/
 Once installed, you can run the following command to start a Postgresql database.
 
 ```bash
-docker run --name some-postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:16-bookworm
+docker run --name some-postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:15-bookworm
 ```
 
 What does this command do?
@@ -59,7 +59,7 @@ What does this command do?
 - `-p 5432:5432`: This is used to map the port 5432 of the container to the port 5432 of the host machine. Postgresql runs on port 5432 by default.
 - `-e` is used to set environment variables. We are setting the username and password for the database.
 - `-d` is used to run the container in the background.
-- `postgres:16-bookworm` is the name of the image we want to run. This is the image for Postgresql version 16-bookworm.
+- `postgres:15-bookworm` is the name of the image we want to run. This is the image for Postgresql version 16-bookworm.
 
 After running this command, you can check if the container is running by running the following command.
 
@@ -88,7 +88,7 @@ For example to start the postgresql database, instead of running the longer comm
 
 ```Makefile
 creatpg:
-	docker run --name some-postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:16-bookworm
+	docker run --name some-postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:15-bookworm
 
 ```
 
@@ -99,7 +99,7 @@ For now we can add the following commands to the Makefile.
 ```Makefile
 
 creatpg:
-	docker run --name some-postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:16-bookworm
+	docker run --name some-postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:15-bookworm
 
 runpg:
 	docker start some-postgres && docker ps
@@ -347,7 +347,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-bookworm
+        image: postgres:15-bookworm
         env:
           POSTGRES_PASSWORD: password
           POSTGRES_USER: root
@@ -385,7 +385,7 @@ This specific workflow is triggered on two events: when a push is made to the "m
 
 The workflow consists of a single job named "test" that runs on the latest version of Ubuntu. This job has several steps and also uses a service, which is a Docker container that the job can interact with.
 
-The service used here is a PostgreSQL database. The image used for this service is postgres:16-bookworm. The environment variables POSTGRES_PASSWORD, POSTGRES_USER, and POSTGRES_DB are set for this service. The service also has health check options and a port mapping.
+The service used here is a PostgreSQL database. The image used for this service is postgres:15-bookworm. The environment variables POSTGRES_PASSWORD, POSTGRES_USER, and POSTGRES_DB are set for this service. The service also has health check options and a port mapping.
 
 The steps in the job include:
 
@@ -748,7 +748,7 @@ Modify the creatpg command in the Makefile to add the network flag.
 ```Makefile
 
 createpg:
-	docker run --name some-postgres --network blognet -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:16-bookworm
+	docker run --name some-postgres --network blognet -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:15-bookworm
 
 ```
 
