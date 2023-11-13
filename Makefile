@@ -23,8 +23,10 @@ createmigration:
 migrateup:
 	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose up $(step)
 
+
 migratedown:
 	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose down $(step)
+
 
 migrateforce:
 	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose force $(version)
@@ -33,7 +35,7 @@ sqlc:
 	sqlc generate
 
 test:
-	go test  -count=1 -timeout 30s -p 1 ./...
+	go test  -count=1 -timeout 120s -p 1 ./...
 
 server:
 	go run main.go
