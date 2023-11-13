@@ -25,7 +25,10 @@
 	- [Dockerisation](#dockerisation)
 		- [Why Docker?](#why-docker)
 		- [Multistage Build](#multistage-build)
+		- [Build the image](#build-the-image)
 		- [Docker networking](#docker-networking)
+		- [Further build optimisations](#further-build-optimisations)
+	- [Using Docker Compose](#using-docker-compose)
 
 ## Database Schema Generation (Postrgesql)
 
@@ -706,6 +709,28 @@ CMD ["/app/main"]
 
 The first stage uses the golang:1.21.4-alpine3.18 image. This image contains the golang compiler and the dependencies required to build the application. The WORKDIR instruction sets the working directory to /app. The COPY instruction copies all the files from the current directory to the /app directory in the container. The RUN instruction runs the go build command to build the application. The -o flag is used to specify the name of the output file. The CMD instruction specifies the command to run when the container starts.
 
+### Build the image
+
+To build the image, we can run the following command.
+
+```bash
+
+docker build -t blog-backend:latest .
+
+```
+
+The -t flag is used to specify the name of the image. The . specifies the current directory.
+
+Note: If the image already exists, you can use the --no-cache flag to build the image from scratch.
+
+```bash
+
+docker build --no-cache -t blog-backend:latest .
+
+```
+
+
+
 ### Docker networking
 
 Notes on docker networking can be found [here](Notes.md/#docker-network).
@@ -736,3 +761,37 @@ docker run --network blognet --name blog-backend -p 8080:8080 -e DB_SOURCE="post
 ```
 
 Note: since both the containers are on the same network, we can use the container name as the host name in the connection string.
+
+
+### Further build optimisations
+
+Found a good method for speeding up builds in golang projects. It uses a cache layer to store the dependencies and the build artifacts. This reduces the build time significantly. 
+You can find the article [here](https://www.docker.com/blog/containerize-your-go-developer-environment-part-2/).
+
+Another one is [here](https://medium.com/@chemidy/create-the-smallest-and-secured-golang-docker-image-based-on-scratch-4752223b7324).
+
+```Dockerfile
+
+# Replacing this in the build stage
+# RUN go build -o main main.go
+
+# with this
+
+WORKDIR /app
+
+COPY . .
+
+ENV CGO_ENABLED=0
+COPY go.* .
+RUN go mod download
+COPY . .
+RUN --mount=type=cache,target=/root/.cache/go-build \
+GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o main main.go
+
+```
+
+This will cache the dependencies and the build artifacts. This will reduce the build time significantly.
+
+
+## Using Docker Compose
+
