@@ -90,3 +90,8 @@ docker network connect <network_name> <container_name>
 docker network inspect <network_name>
 ```
 
+
+postgresql://root:jvPEEf0JMfo9RS4Pe7I9@blogdb.ciosjjwyksre.ap-south-1.rds.amazonaws.com:5432/blogdb
+
+
+

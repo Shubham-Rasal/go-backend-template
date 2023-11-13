@@ -1,11 +1,12 @@
 createpg:
-	docker run --name some-postgres --network blognet -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:15-bookworm
+	docker run --name some-postgres --network blognet -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:14-bookworm
 
 runpg:
 	docker start some-postgres && docker ps
 
 intopg:
 	docker exec -it some-postgres psql -U root
+
 
 stoppg:
 	docker stop some-postgres
@@ -40,4 +41,4 @@ server:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/Shubham-Rasal/blog-backend/db/sqlc Store
 
-.PHONY: createdb dropdb creatpg runpg  stoppg migrateup migratedown test sqlc server mock intopg migrateforce createmigration
+.PHONY: createdb dropdb createpg runpg  stoppg migrateup migratedown test sqlc server mock intopg migrateforce createmigration 
