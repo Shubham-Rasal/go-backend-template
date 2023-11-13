@@ -1,2 +1,6 @@
 migrate
 *.env
+*.crt
+*.key
+*.pem
+Notes.md
