@@ -16,7 +16,6 @@ jobs:
     name: Build Image
     runs-on: ubuntu-latest
     
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -41,5 +40,5 @@ jobs:
             REPOSITORY: blog-backend
             IMAGE_TAG: ${{ github.sha }}
         run: |
-            docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+            docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG Dockerfile.prod .
             docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
