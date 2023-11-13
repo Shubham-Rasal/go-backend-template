@@ -40,5 +40,5 @@ jobs:
             REPOSITORY: blog-backend
             IMAGE_TAG: ${{ github.sha }}
         run: |
-            docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG Dockerfile.prod .
+            docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG Dockerfile.prod
             docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
