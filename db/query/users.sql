@@ -22,7 +22,8 @@ WHERE id = $2;
 
 -- name: UpdateEmail :exec
 UPDATE users SET email = $1
-WHERE id = $2;
+WHERE id = $2
+RETURNING id;
 
 -- name: DeleteUser :exec
 DELETE FROM users

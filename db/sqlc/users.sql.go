@@ -118,6 +118,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 const updateEmail = `-- name: UpdateEmail :exec
 UPDATE users SET email = $1
 WHERE id = $2
+RETURNING id
 `
 
 type UpdateEmailParams struct {
