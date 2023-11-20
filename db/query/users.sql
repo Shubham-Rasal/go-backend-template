@@ -20,7 +20,7 @@ OFFSET $2;
 UPDATE users SET password = $1
 WHERE id = $2;
 
--- name: UpdateEmail :exec
+-- name: UpdateEmail :one
 UPDATE users SET email = $1
 WHERE id = $2
 RETURNING id;

@@ -242,11 +242,12 @@ func (mr *MockStoreMockRecorder) ListUsers(arg0, arg1 interface{}) *gomock.Call 
 }
 
 // UpdateEmail mocks base method.
-func (m *MockStore) UpdateEmail(arg0 context.Context, arg1 db.UpdateEmailParams) error {
+func (m *MockStore) UpdateEmail(arg0 context.Context, arg1 db.UpdateEmailParams) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateEmail", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // UpdateEmail indicates an expected call of UpdateEmail.

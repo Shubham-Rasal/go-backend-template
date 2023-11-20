@@ -115,7 +115,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 	return items, nil
 }
 
-const updateEmail = `-- name: UpdateEmail :exec
+const updateEmail = `-- name: UpdateEmail :one
 UPDATE users SET email = $1
 WHERE id = $2
 RETURNING id
@@ -126,9 +126,11 @@ type UpdateEmailParams struct {
 	ID    int64  `json:"id"`
 }
 
-func (q *Queries) UpdateEmail(ctx context.Context, arg UpdateEmailParams) error {
-	_, err := q.exec(ctx, q.updateEmailStmt, updateEmail, arg.Email, arg.ID)
-	return err
+func (q *Queries) UpdateEmail(ctx context.Context, arg UpdateEmailParams) (int64, error) {
+	row := q.queryRow(ctx, q.updateEmailStmt, updateEmail, arg.Email, arg.ID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const updatePassword = `-- name: UpdatePassword :exec

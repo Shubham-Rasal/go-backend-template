@@ -22,7 +22,7 @@ type Querier interface {
 	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
-	UpdateEmail(ctx context.Context, arg UpdateEmailParams) error
+	UpdateEmail(ctx context.Context, arg UpdateEmailParams) (int64, error)
 	UpdatePassword(ctx context.Context, arg UpdatePasswordParams) error
 	UpdateReputation(ctx context.Context, arg UpdateReputationParams) error
 }

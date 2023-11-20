@@ -94,8 +94,9 @@ func TestUpdateEmail(t *testing.T) {
 		ID:    user.ID,
 		Email: newEmail,
 	}
-	err := testQueries.UpdateEmail(context.Background(), arg)
+	id , err := testQueries.UpdateEmail(context.Background(), arg)
 	require.NoError(t, err)
+	require.NotEmpty(t, id)
 
 	// Retrieve the updated user from the database
 	updatedUser, err := testQueries.GetUserById(context.Background(), user.ID)
