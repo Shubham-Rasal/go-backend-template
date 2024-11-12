@@ -1,11 +1,11 @@
 createpg:
-	docker run --name some-postgres --network blognet -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:14-bookworm
+	docker run --name some-postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:17
 
 runpg:
 	docker start some-postgres && docker ps
 
 intopg:
-	docker exec -it some-postgres psql -U root
+	docker exec -it go-backend-template-postgres-1 psql
 
 
 stoppg:
@@ -21,11 +21,11 @@ createmigration:
 	migrate create -ext sql -dir db/migration -seq $(name) -verbose
 
 migrateup:
-	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose up $(step)
+	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=require" -verbose up $(step)
 
 
 migratedown:
-	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=disable" -verbose down $(step)
+	migrate -path db/migration -database "postgresql://root:password@localhost:5432/blog?sslmode=require" -verbose down $(step)
 
 
 migrateforce:

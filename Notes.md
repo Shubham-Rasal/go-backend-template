@@ -1,4 +1,4 @@
-## Update sch
+## Update schema
 
 ### Reputation
 

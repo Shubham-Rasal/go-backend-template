@@ -795,3 +795,4 @@ This will cache the dependencies and the build artifacts. This will reduce the b
 
 ## Using Docker Compose
 
+All the services 

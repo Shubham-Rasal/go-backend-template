@@ -2,28 +2,37 @@ version: '3.9'
 
 services:
   postgres:
-    image: postgres:14-bookworm
+    image: postgres:17
     restart: always
+    command: >
+      -c ssl=on 
+      -c ssl_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem 
+      -c ssl_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=blog
+    volumes:
+      - ./ca/server.crt:/var/lib/postgresql/server.crt
+      - ./ca/server.key:/var/lib/postgresql/server.key
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "root" , "-d", "blog"]
       interval: 5s
       timeout: 5s
-      retries: 5  
-
-
-  api:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+      retries: 5
     ports:
-      - 8080:8080
-    depends_on:
-      - postgres
-    environment:
-      - DB_SOURCE=postgres://root:password@postgres:5432/blog?sslmode=disable
+      - 5432:5432  
+
+
+  # api:
+  #   build: 
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8080:8080
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     - DB_SOURCE=postgres://root:password@postgres:5432/blog?sslmode=disable
 
     
