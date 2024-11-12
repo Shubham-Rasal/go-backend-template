@@ -795,4 +795,7 @@ This will cache the dependencies and the build artifacts. This will reduce the b
 
 ## Using Docker Compose
 
-All the services 
+All the services can be combined and run at once using docker compose. The docker compose file is present in the root directory of the project.
+
+The docker compose creates a default network of which all services are part of. This allows the services to communicate with each other using the service name as the hostname.
+
